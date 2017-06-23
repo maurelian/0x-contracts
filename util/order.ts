@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import {ZeroEx} from '0x.js';
 import ethUtil = require('ethereumjs-util');
 import promisify = require('es6-promisify');
 import Web3 = require('web3');
@@ -16,19 +17,8 @@ export class Order {
     this.params = params;
   }
   public isValidSignature() {
-    const { v, r, s } = this.params;
-    if (_.isUndefined(v) || _.isUndefined(r) || _.isUndefined(s)) {
-      throw new Error('Cannot call isValidSignature on unsigned order');
-    }
-    const orderHash = this.getOrderHash();
-    const msgHash = ethUtil.hashPersonalMessage(orderHash);
-    try {
-      const pubKey = ethUtil.ecrecover(msgHash, v, ethUtil.toBuffer(r), ethUtil.toBuffer(s));
-      const recoveredAddress = ethUtil.bufferToHex(ethUtil.pubToAddress(pubKey));
-      return recoveredAddress === this.params.maker;
-    } catch (err) {
-      return false;
-    }
+      const { v, r, s } = this.params;
+      return ZeroEx.isValidSignature('0x' + this.getOrderHash().toString('hex'), {v, r, s}, this.params.maker);
   }
   public async signAsync() {
     const orderHash = this.getOrderHash();
