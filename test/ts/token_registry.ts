@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import {ZeroEx} from '0x.js';
 import * as assert from 'assert';
 import ethUtil = require('ethereumjs-util');
 import { testUtil } from '../../util/test_util';
@@ -24,7 +25,7 @@ contract('TokenRegistry', (accounts: string[]) => {
   };
 
   const nullToken = {
-    address: constants.NULL_ADDRESS,
+    address: ZeroEx.NULL_ADDRESS,
     name: '',
     symbol: '',
     url: '',

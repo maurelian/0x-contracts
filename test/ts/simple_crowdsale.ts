@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import {ZeroEx} from '0x.js';
 import Web3 = require('web3');
 import * as BigNumber from 'bignumber.js';
 import promisify = require('es6-promisify');
@@ -9,7 +10,6 @@ import { testUtil } from '../../util/test_util';
 import { Order } from '../../util/order';
 import { BalancesByOwner, ContractInstance } from '../../util/types';
 import { Artifacts } from '../../util/artifacts';
-import { constants } from '../../util/constants';
 
 const {
   SimpleCrowdsale,
@@ -63,8 +63,8 @@ contract('SimpleCrowdsale', (accounts: string[]) => {
     const orderParams = {
       exchange: Exchange.address,
       maker,
-      taker: constants.NULL_ADDRESS,
-      feeRecipient: constants.NULL_ADDRESS,
+      taker: ZeroEx.NULL_ADDRESS,
+      feeRecipient: ZeroEx.NULL_ADDRESS,
       tokenM: zrxAddress,
       tokenT: wEthAddress,
       valueM: toSmallestUnits(10),
@@ -144,8 +144,8 @@ contract('SimpleCrowdsale', (accounts: string[]) => {
       const orderParams = {
         exchange: Exchange.address,
         maker,
-        taker: constants.NULL_ADDRESS,
-        feeRecipient: constants.NULL_ADDRESS,
+        taker: ZeroEx.NULL_ADDRESS,
+        feeRecipient: ZeroEx.NULL_ADDRESS,
         tokenM: invalidTokenAddress,
         tokenT: wEthAddress,
         valueM: toSmallestUnits(10),
@@ -177,8 +177,8 @@ contract('SimpleCrowdsale', (accounts: string[]) => {
       const orderParams = {
         exchange: Exchange.address,
         maker,
-        taker: constants.NULL_ADDRESS,
-        feeRecipient: constants.NULL_ADDRESS,
+        taker: ZeroEx.NULL_ADDRESS,
+        feeRecipient: ZeroEx.NULL_ADDRESS,
         tokenM: zrxAddress,
         tokenT: invalidTokenAddress,
         valueM: toSmallestUnits(10),

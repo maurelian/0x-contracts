@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import {ZeroEx} from '0x.js';
 import ethUtil = require('ethereumjs-util');
 import * as BigNumber from 'bignumber.js';
 import { constants } from '../../../util/constants';
@@ -288,7 +289,7 @@ contract('Exchange', (accounts: string[]) => {
 
     it('should log 1 event with the correct arguments when order has no feeRecipient', async () => {
       order = await orderFactory.newSignedOrderAsync({
-        feeRecipient: constants.NULL_ADDRESS,
+        feeRecipient: ZeroEx.NULL_ADDRESS,
       });
       const divisor = 2;
       const res = await exWrapper.fillAsync(order, taker, { fillValueT: order.params.valueT.div(divisor) });
