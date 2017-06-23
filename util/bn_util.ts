@@ -2,6 +2,10 @@ import BN = require('bn.js');
 import * as BigNumber from 'bignumber.js';
 
 type BNValue = number|string|BigNumber.BigNumber;
+BigNumber.config({
+    EXPONENTIAL_AT: 1000,
+});
+console.log("CONFIGURED");
 
 export const BNUtil = {
   add(numA: BNValue, numB: BNValue): string {
