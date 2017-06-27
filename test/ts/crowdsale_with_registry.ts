@@ -268,7 +268,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       expect(logArgs.expirationTimestampInSec.toString())
         .to.be.bignumber.equal(validOrder.params.expirationTimestampInSec);
       expect(logArgs.salt.toString()).to.be.bignumber.equal(validOrder.params.salt);
-      expect(logArgs.v).to.be.equal(validOrder.params.v);
+      expect(logArgs.v.toString()).to.be.bignumber.equal(validOrder.params.v);
       expect(logArgs.r).to.be.equal(validOrder.params.r);
       expect(logArgs.s).to.be.equal(validOrder.params.s);
 
