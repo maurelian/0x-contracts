@@ -117,7 +117,7 @@ contract('TokenRegistry', (accounts: string[]) => {
         tokenRegWrapper.getTokenBySymbolAsync(newSymbolToken.symbol),
         tokenRegWrapper.getTokenBySymbolAsync(token.symbol),
       ]);
-      expect(newData).to.deep.equal(newNameToken);
+      expect(newData).to.deep.equal(newSymbolToken);
       expect(oldData).to.deep.equal(nullToken);
     });
   });
