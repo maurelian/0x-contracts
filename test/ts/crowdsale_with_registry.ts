@@ -73,7 +73,6 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       tokenRegistry.getTokenAddressBySymbol('WETH'),
       tokenRegistry.getTokenAddressBySymbol('REP'),
     ]);
-    console.log(zrxAddress, wEthAddress, invalidTokenAddress);
     crowdsaleWithRegistry = await CrowdsaleWithRegistry.new(
       Exchange.address,
       Proxy.address,
@@ -480,7 +479,8 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       }
     });
 
-    it('should trade sent ETH for protocol tokens if sender is registered, ETH <= remaining order ETH and capPerAddress', async () => {
+    it('should trade sent ETH for protocol tokens if sender is registered, \
+        ETH <= remaining order ETH and capPerAddress', async () => {
       const initBalances: BalancesByOwner = await dmyBalances.getAsync();
       const initTakerEthBalance = await getEthBalance(taker);
 
@@ -581,7 +581,6 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       expect(isFinished).to.be.true();
 
       try {
-        const ethValue = web3Instance.toWei(1, 'ether');
         await crowdsaleWithRegistry.fillOrderWithEth({
           from: taker,
           value: ethValue,
@@ -634,7 +633,8 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       );
     });
 
-    it('should trade sent ETH for protocol tokens if sender is registered, ETH <= remaining order ETH and capPerAddress', async () => {
+    it('should trade sent ETH for protocol tokens if sender is registered, \
+        ETH <= remaining order ETH and capPerAddress', async () => {
       const initBalances: BalancesByOwner = await dmyBalances.getAsync();
       const initTakerEthBalance = await getEthBalance(taker);
 
