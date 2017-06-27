@@ -1,5 +1,7 @@
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../util/chai_setup';
 import promisify = require('es6-promisify');
+import * as BigNumber from 'bignumber.js';
 import Web3 = require('web3');
 import { RPC } from '../../util/rpc';
 import { MultiSigWrapper } from '../../util/multi_sig_wrapper';
@@ -7,6 +9,9 @@ import { testUtil } from '../../util/test_util';
 import { ContractInstance } from '../../util/types';
 import * as multiSigWalletJSON from '../../build/contracts/MultiSigWalletWithTimeLock.json';
 import { Artifacts } from '../../util/artifacts';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const { MultiSigWalletWithTimeLock } = new Artifacts(artifacts);
 
@@ -66,25 +71,25 @@ contract('MultiSigWalletWithTimeLock', (accounts: string[]) => {
 
     it('should set confirmation time with enough confirmations', async () => {
       const res = await multiSig.confirmTransaction(txId, { from: owners[1] });
-      assert.equal(res.logs.length, 2);
+      expect(res.logs).to.be.lengthOf(2);
       const blockNum = await promisify(web3Instance.eth.getBlockNumber)();
       const blockInfo = await promisify(web3Instance.eth.getBlock)(blockNum);
       const timestamp = blockInfo.timestamp;
       const confirmationTimeBigNum = await multiSig.confirmationTimes.call(txId);
       const confirmationTime = confirmationTimeBigNum.toNumber();
 
-      assert.equal(timestamp, confirmationTime);
+      expect(timestamp).to.be.equal(confirmationTime);
     });
 
     it('should be executable with enough confirmations and secondsTimeLocked of 0', async () => {
-      assert.equal(initialSecondsTimeLocked, 0);
+      expect(initialSecondsTimeLocked).to.be.equal(0);
 
       const res = await multiSig.executeTransaction(txId);
-      assert.equal(res.logs.length, 2);
+      expect(res.logs).to.be.lengthOf(2);
 
       const secondsTimeLocked = await multiSig.secondsTimeLocked.call();
       const newSecondsTimeLocked = secondsTimeLocked.toNumber();
-      assert.equal(newSecondsTimeLocked, SECONDS_TIME_LOCKED);
+      expect(newSecondsTimeLocked).to.be.equal(SECONDS_TIME_LOCKED);
     });
 
     const newSecondsTimeLocked = 0;
@@ -100,7 +105,7 @@ contract('MultiSigWalletWithTimeLock', (accounts: string[]) => {
 
       txId = subRes.logs[0].args.transactionId.toNumber();
       const confRes = await multiSig.confirmTransaction(txId, { from: owners[1] });
-      assert.equal(confRes.logs.length, 2);
+      expect(confRes.logs).to.be.lengthOf(2);
 
       try {
         const execRes = await multiSig.executeTransaction(txId);
@@ -114,8 +119,8 @@ contract('MultiSigWalletWithTimeLock', (accounts: string[]) => {
       await rpc.increaseTimeAsync(SECONDS_TIME_LOCKED);
       await multiSig.executeTransaction(txId);
 
-      const secondsTimeLocked = await multiSig.secondsTimeLocked.call();
-      assert.equal(secondsTimeLocked.toNumber(), newSecondsTimeLocked);
+      const secondsTimeLocked = new BigNumber(await multiSig.secondsTimeLocked.call());
+      expect(secondsTimeLocked).to.be.bignumber.equal(newSecondsTimeLocked);
     });
   });
 });
