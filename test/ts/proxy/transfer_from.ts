@@ -1,9 +1,13 @@
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../../util/chai_setup';
 import { Balances } from '../../../util/balances';
 import { BNUtil } from '../../../util/bn_util';
 import { testUtil } from '../../../util/test_util';
 import { ContractInstance } from '../../../util/types';
 import { Artifacts } from '../../../util/artifacts';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const {
   Exchange,
@@ -61,8 +65,10 @@ contract('Proxy', (accounts: string[]) => {
       await proxy.transferFrom(rep.address, accounts[0], accounts[1], transferAmt, { from: notAuthorized });
 
       const newBalances = await dmyBalances.getAsync();
-      assert.equal(newBalances[accounts[0]][rep.address], sub(balances[accounts[0]][rep.address], transferAmt));
-      assert.equal(newBalances[accounts[1]][rep.address], add(balances[accounts[1]][rep.address], transferAmt));
+      expect(newBalances[accounts[0]][rep.address])
+        .to.be.bignumber.equal(sub(balances[accounts[0]][rep.address], transferAmt));
+      expect(newBalances[accounts[1]][rep.address])
+        .to.be.bignumber.equal(add(balances[accounts[1]][rep.address], transferAmt));
     });
   });
 });
