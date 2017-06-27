@@ -19,8 +19,8 @@ const {
 const { add, sub } = BNUtil;
 
 contract('Proxy', (accounts: string[]) => {
-  const INIT_BAL = 100000000;
-  const INIT_ALLOW = 100000000;
+  const INITIAL_BALLANCE = 100000000;
+  const INITIAL_ALLOWANCE = 100000000;
 
   const owner = accounts[0];
   const notAuthorized = owner;
@@ -40,10 +40,10 @@ contract('Proxy', (accounts: string[]) => {
 
     dmyBalances = new Balances([rep], [accounts[0], accounts[1]]);
     await Promise.all([
-      rep.approve(Proxy.address, INIT_ALLOW, { from: accounts[0] }),
-      rep.setBalance(accounts[0], INIT_BAL, { from: owner }),
-      rep.approve(Proxy.address, INIT_ALLOW, { from: accounts[1] }),
-      rep.setBalance(accounts[1], INIT_BAL, { from: owner }),
+      rep.approve(Proxy.address, INITIAL_ALLOWANCE, { from: accounts[0] }),
+      rep.setBalance(accounts[0], INITIAL_BALLANCE, { from: owner }),
+      rep.approve(Proxy.address, INITIAL_ALLOWANCE, { from: accounts[1] }),
+      rep.setBalance(accounts[1], INITIAL_BALLANCE, { from: owner }),
     ]);
   });
 
