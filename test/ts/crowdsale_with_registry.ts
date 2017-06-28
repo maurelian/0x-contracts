@@ -16,7 +16,7 @@ chaiSetup.configure();
 const expect = chai.expect;
 
 const {
-  CrowdsaleWithRegistry,
+  TokenDistributionWithRegistry,
   TokenRegistry,
   Exchange,
   DummyToken,
@@ -29,7 +29,7 @@ const { add, sub, mul, div, cmp, toSmallestUnits } = BNUtil;
 // with type `any` to a variable of type `Web3`.
 const web3Instance: Web3 = web3;
 
-contract('CrowdsaleWithRegistry', (accounts: string[]) => {
+contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   const maker = accounts[0];
   const taker = accounts[1];
   const owner = accounts[0];
@@ -38,7 +38,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
   let capPerAddress = new BigNumber(web3Instance.toWei(1, 'ether'));
 
   let tokenRegistry: ContractInstance;
-  let crowdsaleWithRegistry: ContractInstance;
+  let tokenDistributionWithRegistry: ContractInstance;
   let exchange: ContractInstance;
   let zrx: ContractInstance;
   let wEth: ContractInstance;
@@ -73,7 +73,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       tokenRegistry.getTokenAddressBySymbol('WETH'),
       tokenRegistry.getTokenAddressBySymbol('REP'),
     ]);
-    crowdsaleWithRegistry = await CrowdsaleWithRegistry.new(
+    tokenDistributionWithRegistry = await TokenDistributionWithRegistry.new(
       Exchange.address,
       Proxy.address,
       zrxAddress,
@@ -84,7 +84,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     validOrderParams = {
       exchangeContractAddress: Exchange.address,
       maker,
-      taker: crowdsaleWithRegistry.address,
+      taker: tokenDistributionWithRegistry.address,
       feeRecipient: constants.NULL_ADDRESS,
       makerToken: zrxAddress,
       takerToken: wEthAddress,
@@ -113,7 +113,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     it('should throw when not called by owner', async () => {
       const params = validOrder.createFill();
       try {
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -131,7 +131,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       try {
         const params = validOrder.createFill();
         const invalidR = ethUtil.bufferToHex(ethUtil.sha3('invalidR'));
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -164,7 +164,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const params = newOrder.createFill();
 
       try {
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -197,7 +197,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const params = newOrder.createFill();
 
       try {
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -229,7 +229,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       await invalidOrder.signAsync();
       const params = invalidOrder.createFill();
       try {
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -245,7 +245,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
 
     it('should initialize the sale with valid order params and log correct args', async () => {
       const params = validOrder.createFill();
-      const res = await crowdsaleWithRegistry.init(
+      const res = await tokenDistributionWithRegistry.init(
         params.orderAddresses,
         params.orderValues,
         params.v,
@@ -271,14 +271,14 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       expect(logArgs.r).to.be.equal(validOrder.params.r);
       expect(logArgs.s).to.be.equal(validOrder.params.s);
 
-      const isInitialized = await crowdsaleWithRegistry.isInitialized.call();
+      const isInitialized = await tokenDistributionWithRegistry.isInitialized.call();
       expect(isInitialized).to.be.true();
     });
 
     it('should throw if the sale has already been initialized', async () => {
       const params = validOrder.createFill();
       try {
-        await crowdsaleWithRegistry.init(
+        await tokenDistributionWithRegistry.init(
           params.orderAddresses,
           params.orderValues,
           params.v,
@@ -296,7 +296,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
   describe('registerAddress', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await crowdsaleWithRegistry.registerAddress(taker, { from: notOwner });
+        await tokenDistributionWithRegistry.registerAddress(taker, { from: notOwner });
         throw new Error('registerAddress succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -304,12 +304,12 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should register an address if called by owner', async () => {
-      await crowdsaleWithRegistry.registerAddress(taker, { from: owner });
-      let isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.true();
 
-      await crowdsaleWithRegistry.deregisterAddress(taker, { from: owner });
-      isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
+      isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.false();
     });
   });
@@ -317,7 +317,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
   describe('registerAddresses', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await crowdsaleWithRegistry.registerAddresses([taker], { from: notOwner });
+        await tokenDistributionWithRegistry.registerAddresses([taker], { from: notOwner });
         throw new Error('registerAddresses succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -325,15 +325,15 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should register addresses if called by owner', async () => {
-      await crowdsaleWithRegistry.registerAddresses([maker, taker], { from: owner });
-      let isMakerRegistered = await crowdsaleWithRegistry.registered.call(maker);
-      let isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.registerAddresses([maker, taker], { from: owner });
+      let isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
+      let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.true();
       expect(isTakerRegistered).to.be.true();
 
-      await crowdsaleWithRegistry.deregisterAddresses([maker, taker], { from: owner });
-      isMakerRegistered = await crowdsaleWithRegistry.registered.call(maker);
-      isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.deregisterAddresses([maker, taker], { from: owner });
+      isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
+      isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.false();
       expect(isTakerRegistered).to.be.false();
     });
@@ -342,7 +342,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
   describe('deregisterAddress', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await crowdsaleWithRegistry.deregisterAddress(taker, { from: notOwner });
+        await tokenDistributionWithRegistry.deregisterAddress(taker, { from: notOwner });
         throw new Error('deregisterAddress succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -350,11 +350,11 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should deregister an address if called by owner', async () => {
-      await crowdsaleWithRegistry.registerAddress(taker, { from: owner });
-      let isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.true();
-      await crowdsaleWithRegistry.deregisterAddress(taker, { from: owner });
-      isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
+      isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.false();
     });
   });
@@ -362,7 +362,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
   describe('deregisterAddresses', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await crowdsaleWithRegistry.deregisterAddresses([taker], { from: notOwner });
+        await tokenDistributionWithRegistry.deregisterAddresses([taker], { from: notOwner });
         throw new Error('deregisterAddresses succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -370,15 +370,15 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should deregister addresses if called by owner', async () => {
-      await crowdsaleWithRegistry.registerAddresses([maker, taker], { from: owner });
-      let isMakerRegistered = await crowdsaleWithRegistry.registered.call(maker);
-      let isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.registerAddresses([maker, taker], { from: owner });
+      let isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
+      let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.true();
       expect(isTakerRegistered).to.be.true();
 
-      await crowdsaleWithRegistry.deregisterAddresses([maker, taker], { from: owner });
-      isMakerRegistered = await crowdsaleWithRegistry.registered.call(maker);
-      isTakerRegistered = await crowdsaleWithRegistry.registered.call(taker);
+      await tokenDistributionWithRegistry.deregisterAddresses([maker, taker], { from: owner });
+      isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
+      isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.false();
       expect(isTakerRegistered).to.be.false();
     });
@@ -388,7 +388,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     it('should throw if not called by owner', async () => {
       try {
         const newCapPerAddress = web3Instance.toWei(1.1, 'ether');
-        await crowdsaleWithRegistry.setCapPerAddress(newCapPerAddress, { from: notOwner });
+        await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: notOwner });
         throw new Error('setCapPerAddress succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -397,15 +397,15 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
 
     it('should set a new capPerAddress if called by owner', async () => {
       const newCapPerAddress = new BigNumber(web3Instance.toWei(1.1, 'ether'));
-      await crowdsaleWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
-      capPerAddress = new BigNumber(await crowdsaleWithRegistry.capPerAddress.call());
+      await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
+      capPerAddress = new BigNumber(await tokenDistributionWithRegistry.capPerAddress.call());
       expect(newCapPerAddress).to.be.bignumber.equal(capPerAddress);
     });
   });
 
   describe('fillOrderWithEth', () => {
     beforeEach(async () => {
-      crowdsaleWithRegistry = await CrowdsaleWithRegistry.new(
+      tokenDistributionWithRegistry = await TokenDistributionWithRegistry.new(
         Exchange.address,
         Proxy.address,
         zrxAddress,
@@ -413,12 +413,12 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await crowdsaleWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
 
       validOrderParams = {
         exchangeContractAddress: Exchange.address,
         maker,
-        taker: crowdsaleWithRegistry.address,
+        taker: tokenDistributionWithRegistry.address,
         feeRecipient: constants.NULL_ADDRESS,
         makerToken: zrxAddress,
         takerToken: wEthAddress,
@@ -433,7 +433,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       await validOrder.signAsync();
       const params = validOrder.createFill();
 
-      await crowdsaleWithRegistry.init(
+      await tokenDistributionWithRegistry.init(
         params.orderAddresses,
         params.orderValues,
         params.v,
@@ -444,7 +444,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should throw if sale not initialized', async () => {
-      crowdsaleWithRegistry = await CrowdsaleWithRegistry.new(
+      tokenDistributionWithRegistry = await TokenDistributionWithRegistry.new(
         Exchange.address,
         Proxy.address,
         zrxAddress,
@@ -452,10 +452,10 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await crowdsaleWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
       try {
         const ethValue = new BigNumber(1);
-        await crowdsaleWithRegistry.fillOrderWithEth({
+        await tokenDistributionWithRegistry.fillOrderWithEth({
           from: taker,
           value: ethValue,
         });
@@ -466,10 +466,10 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
     });
 
     it('should throw if the caller is not registered', async () => {
-      await crowdsaleWithRegistry.deregisterAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
       try {
         const ethValue = new BigNumber(1);
-        await crowdsaleWithRegistry.fillOrderWithEth({
+        await tokenDistributionWithRegistry.fillOrderWithEth({
           from: taker,
           value: ethValue,
         });
@@ -488,7 +488,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const zrxValue = div(mul(ethValue, validOrder.params.makerTokenAmount), validOrder.params.takerTokenAmount);
       const gasPrice = web3Instance.toWei(20, 'gwei');
 
-      const res = await crowdsaleWithRegistry.fillOrderWithEth({
+      const res = await tokenDistributionWithRegistry.fillOrderWithEth({
         from: taker,
         value: ethValue,
         gas: 300000,
@@ -516,7 +516,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const ethValue = add(capPerAddress, 1);
       const gasPrice = web3Instance.toWei(20, 'gwei');
 
-      const res = await crowdsaleWithRegistry.fillOrderWithEth({
+      const res = await tokenDistributionWithRegistry.fillOrderWithEth({
         from: taker,
         value: ethValue,
         gas: 300000,
@@ -541,7 +541,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
 
     it('should partial fill and end sale if sender is registered and sent ETH > remaining order ETH', async () => {
       const newCapPerAddress = mul(validOrder.params.makerTokenAmount, 2);
-      await crowdsaleWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
+      await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
       const initBalances: BalancesByOwner = await dmyBalances.getAsync();
       const initTakerEthBalance = await getEthBalance(taker);
       const remainingTakerTokenAmount = sub(
@@ -552,7 +552,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const ethValue = web3Instance.toWei(6, 'ether');
       const gasPrice = web3Instance.toWei(6, 'gwei');
 
-      const res = await crowdsaleWithRegistry.fillOrderWithEth({
+      const res = await tokenDistributionWithRegistry.fillOrderWithEth({
         from: taker,
         value: ethValue,
         gas: 300000,
@@ -577,11 +577,11 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         .to.be.bignumber.equal(sub(sub(initTakerEthBalance, filledEthValue), ethSpentOnGas));
 
       expect(res.receipt.logs.length).to.be.equal(5);
-      const isFinished = await crowdsaleWithRegistry.isFinished.call();
+      const isFinished = await tokenDistributionWithRegistry.isFinished.call();
       expect(isFinished).to.be.true();
 
       try {
-        await crowdsaleWithRegistry.fillOrderWithEth({
+        await tokenDistributionWithRegistry.fillOrderWithEth({
           from: taker,
           value: ethValue,
           gas: 300000,
@@ -595,7 +595,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
 
   describe('fallback', () => {
     beforeEach(async () => {
-      crowdsaleWithRegistry = await CrowdsaleWithRegistry.new(
+      tokenDistributionWithRegistry = await TokenDistributionWithRegistry.new(
         Exchange.address,
         Proxy.address,
         zrxAddress,
@@ -603,12 +603,12 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await crowdsaleWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
 
       validOrderParams = {
         exchangeContractAddress: Exchange.address,
         maker,
-        taker: crowdsaleWithRegistry.address,
+        taker: tokenDistributionWithRegistry.address,
         feeRecipient: constants.NULL_ADDRESS,
         makerToken: zrxAddress,
         takerToken: wEthAddress,
@@ -623,7 +623,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       await validOrder.signAsync();
       const params = validOrder.createFill();
 
-      await crowdsaleWithRegistry.init(
+      await tokenDistributionWithRegistry.init(
         params.orderAddresses,
         params.orderValues,
         params.v,
@@ -644,7 +644,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
 
       const txHash = await sendTransaction({
         from: taker,
-        to: crowdsaleWithRegistry.address,
+        to: tokenDistributionWithRegistry.address,
         value: ethValue,
         gas: 300000,
         gasPrice,
