@@ -269,7 +269,8 @@ contract('Exchange', (accounts: string[]) => {
       const cancelTakerTokenAmounts = _.map(orders, order => order.params.takerTokenAmount);
       await exWrapper.batchCancelOrdersAsync(orders, maker, { cancelTakerTokenAmounts });
 
-      const res = await exWrapper.batchFillOrdersAsync(orders, taker, { fillTakerTokenAmounts: cancelTakerTokenAmounts });
+      const res = await exWrapper.batchFillOrdersAsync(
+          orders, taker, { fillTakerTokenAmounts: cancelTakerTokenAmounts });
       const newBalances = await dmyBalances.getAsync();
       assert.deepEqual(balances, newBalances);
     });
