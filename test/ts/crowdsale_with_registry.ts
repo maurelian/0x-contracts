@@ -81,8 +81,6 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
       capPerAddress,
     );
 
-    console.log(tokenDistributionWithRegistry);
-
     validOrderParams = {
       exchangeContractAddress: Exchange.address,
       maker,
