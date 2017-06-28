@@ -1,4 +1,5 @@
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../util/chai_setup';
 import Web3 = require('web3');
 import * as BigNumber from 'bignumber.js';
 import * as _ from 'lodash';
@@ -12,6 +13,9 @@ import { Order } from '../../util/order';
 import { BalancesByOwner, ContractInstance, OrderParams } from '../../util/types';
 import { Artifacts } from '../../util/artifacts';
 import { constants } from '../../util/constants';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const {
   TokenDistributionWithRegistry,
@@ -208,25 +212,25 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         { from: owner },
       );
 
-      assert.equal(res.logs.length, 1, 'Expected a single event to fire when the sale is successfully initialized');
+      expect(res.logs, 'Expected a single event to fire when the sale is successfully initialized').to.have.lengthOf(1);
       const logArgs = res.logs[0].args;
-      assert.equal(logArgs.maker, validOrder.params.maker);
-      assert.equal(logArgs.taker, validOrder.params.taker);
-      assert.equal(logArgs.makerToken, validOrder.params.makerToken);
-      assert.equal(logArgs.takerToken, validOrder.params.takerToken);
-      assert.equal(logArgs.feeRecipient, validOrder.params.feeRecipient);
-      assert.equal(cmp(logArgs.makerTokenAmount, validOrder.params.makerTokenAmount), 0);
-      assert.equal(cmp(logArgs.takerTokenAmount, validOrder.params.takerTokenAmount), 0);
-      assert.equal(cmp(logArgs.makerFee, validOrder.params.makerFee), 0);
-      assert.equal(cmp(logArgs.takerFee, validOrder.params.takerFee), 0);
-      assert.equal(cmp(logArgs.expirationTimestampInSec, validOrder.params.expirationTimestampInSec), 0);
-      assert.equal(cmp(logArgs.salt, validOrder.params.salt), 0);
-      assert.equal(logArgs.v, validOrder.params.v);
-      assert.equal(logArgs.r, validOrder.params.r);
-      assert.equal(logArgs.s, validOrder.params.s);
+      expect(logArgs.maker).to.be.equal(validOrder.params.maker);
+      expect(logArgs.taker).to.be.equal(validOrder.params.taker);
+      expect(logArgs.makerToken).to.be.equal(validOrder.params.makerToken);
+      expect(logArgs.takerToken).to.be.equal(validOrder.params.takerToken);
+      expect(logArgs.feeRecipient).to.be.equal(validOrder.params.feeRecipient);
+      expect(logArgs.makerTokenAmount).to.be.bignumber.equal(validOrder.params.makerTokenAmount);
+      expect(logArgs.takerTokenAmount).to.be.bignumber.equal(validOrder.params.takerTokenAmount);
+      expect(logArgs.makerFee).to.be.bignumber.equal(validOrder.params.makerFee);
+      expect(logArgs.takerFee).to.be.bignumber.equal(validOrder.params.takerFee);
+      expect(logArgs.expirationTimestampInSec).to.be.bignumber.equal(validOrder.params.expirationTimestampInSec);
+      expect(logArgs.salt).to.be.bignumber.equal(validOrder.params.salt);
+      expect(logArgs.v).to.be.equal(validOrder.params.v);
+      expect(logArgs.r).to.be.equal(validOrder.params.r);
+      expect(logArgs.s).to.be.equal(validOrder.params.s);
 
       const isInitialized = await tokenDistributionWithRegistry.isInitialized.call();
-      assert.equal(isInitialized, true);
+      expect(isInitialized).to.be.true();
     });
 
     it('should throw if the sale has already been initialized', async () => {
@@ -262,12 +266,12 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       let isRegistered = true;
       await tokenDistributionWithRegistry.changeRegistrationStatus(taker, isRegistered, { from: owner });
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
-      assert.equal(isTakerRegistered, true);
+      expect(isTakerRegistered).to.be.true();
 
       isRegistered = false;
       await tokenDistributionWithRegistry.changeRegistrationStatus(taker, isRegistered, { from: owner });
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
-      assert.equal(isTakerRegistered, false);
+      expect(isTakerRegistered).to.be.false();
     });
   });
 
@@ -287,15 +291,15 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], isRegistered, { from: owner });
       let isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
-      assert.equal(isMakerRegistered, true);
-      assert.equal(isTakerRegistered, true);
+      expect(isMakerRegistered).to.be.true();
+      expect(isTakerRegistered).to.be.true();
 
       isRegistered = false;
       await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], isRegistered, { from: owner });
       isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
-      assert.equal(isMakerRegistered, false);
-      assert.equal(isTakerRegistered, false);
+      expect(isMakerRegistered).to.be.false();
+      expect(isTakerRegistered).to.be.false();
     });
   });
 
@@ -314,7 +318,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
       const newCapPerAddress = new BigNumber(web3Instance.toWei(1.1, 'ether'));
       await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
       ethCapPerAddress = await tokenDistributionWithRegistry.ethCapPerAddress.call();
-      assert.equal(cmp(newCapPerAddress, ethCapPerAddress), 0);
+      expect(newCapPerAddress).to.be.bignumber.equal(ethCapPerAddress);
     });
   });
 
@@ -401,13 +405,13 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         const finalTakerEthBalance = await getEthBalanceAsync(taker);
         const ethSpentOnGas = mul(res.receipt.gasUsed, gasPrice);
 
-        assert.equal(finalBalances[maker][validOrder.params.makerToken],
-                     sub(initBalances[maker][validOrder.params.makerToken], zrxValue));
-        assert.equal(finalBalances[maker][validOrder.params.takerToken],
-                     add(initBalances[maker][validOrder.params.takerToken], ethValue));
-        assert.equal(finalBalances[taker][validOrder.params.makerToken],
-                     add(initBalances[taker][validOrder.params.makerToken], zrxValue));
-        assert.equal(finalTakerEthBalance, sub(sub(initTakerEthBalance, ethValue), ethSpentOnGas));
+        expect(finalBalances[maker][validOrder.params.makerToken])
+            .to.be.equal(sub(initBalances[maker][validOrder.params.makerToken], zrxValue));
+        expect(finalBalances[maker][validOrder.params.takerToken])
+            .to.be.equal(add(initBalances[maker][validOrder.params.takerToken], ethValue));
+        expect(finalBalances[taker][validOrder.params.makerToken])
+            .to.be.equal(add(initBalances[taker][validOrder.params.makerToken], zrxValue));
+        expect(finalTakerEthBalance).to.be.bignumber.equal(sub(sub(initTakerEthBalance, ethValue), ethSpentOnGas));
       });
 
       it('should fill the remaining ethCapPerAddress if sent > than the remaining ethCapPerAddress',
@@ -428,13 +432,14 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         const filledZrxValue = ethCapPerAddress;
         const filledEthValue = ethCapPerAddress;
 
-        assert.equal(finalBalances[maker][validOrder.params.makerToken],
-                     sub(initBalances[maker][validOrder.params.makerToken], filledZrxValue));
-        assert.equal(finalBalances[maker][validOrder.params.takerToken],
-                     add(initBalances[maker][validOrder.params.takerToken], filledEthValue));
-        assert.equal(finalBalances[taker][validOrder.params.makerToken],
-                     add(initBalances[taker][validOrder.params.makerToken], filledZrxValue));
-        assert.equal(finalTakerEthBalance, sub(sub(initTakerEthBalance, filledEthValue), ethSpentOnGas));
+        expect(finalBalances[maker][validOrder.params.makerToken])
+            .to.be.equal(sub(initBalances[maker][validOrder.params.makerToken], filledZrxValue));
+        expect(finalBalances[maker][validOrder.params.takerToken])
+            .to.be.equal(add(initBalances[maker][validOrder.params.takerToken], filledEthValue));
+        expect(finalBalances[taker][validOrder.params.makerToken])
+            .to.be.equal(add(initBalances[taker][validOrder.params.makerToken], filledZrxValue));
+        expect(finalTakerEthBalance)
+            .to.be.bignumber.equal(sub(sub(initTakerEthBalance, filledEthValue), ethSpentOnGas));
       });
 
       it('should partial fill and end sale if sender is registered and sent ETH > remaining order ETH', async () => {
@@ -456,22 +461,26 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         const filledZrxValue = validOrder.params.makerTokenAmount;
         const filledEthValue = validOrder.params.takerTokenAmount;
 
-        assert.equal(finalBalances[maker][validOrder.params.makerToken],
-                     sub(initBalances[maker][validOrder.params.makerToken], filledZrxValue));
-        assert.equal(finalBalances[maker][validOrder.params.takerToken],
-                     add(initBalances[maker][validOrder.params.takerToken], filledEthValue));
-        assert.equal(finalBalances[taker][validOrder.params.makerToken],
-                     add(initBalances[taker][validOrder.params.makerToken], filledZrxValue));
-        assert.equal(finalTakerEthBalance, sub(sub(initTakerEthBalance, filledEthValue), ethSpentOnGas));
+        expect(finalBalances[maker][validOrder.params.makerToken])
+            .to.be.equal(sub(initBalances[maker][validOrder.params.makerToken], filledZrxValue));
+        expect(finalBalances[maker][validOrder.params.takerToken])
+            .to.be.equal(add(initBalances[maker][validOrder.params.takerToken], filledEthValue));
+        expect(finalBalances[taker][validOrder.params.makerToken])
+            .to.be.equal(add(initBalances[taker][validOrder.params.makerToken], filledZrxValue));
+        expect(finalTakerEthBalance)
+            .to.be.bignumber.equal(sub(sub(initTakerEthBalance, filledEthValue), ethSpentOnGas));
 
-        assert.equal(res.receipt.logs.length, 5, 'Expected 5 events to fire when the sale is successfully initialized');
+        expect(
+            res.receipt.logs,
+            'Expected 5 events to fire when the sale is successfully initialized',
+        ).to.have.lengthOf(5);
         const finishedLog = res.receipt.logs[4];
         const funcSig = finishedLog.topics[0].slice(2, 10);
         const expectedFuncSig = crypto.solSHA3(['Finished()']).slice(0, 4).toString('hex');
-        assert.equal(funcSig, expectedFuncSig);
+        expect(funcSig).to.be.equal(expectedFuncSig);
 
         const isFinished = await tokenDistributionWithRegistry.isFinished.call();
-        assert.equal(isFinished, true);
+        expect(isFinished).to.be.true();
       });
 
       it('should throw if sale has ended', async () => {
@@ -487,7 +496,7 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         });
 
         const isFinished = await tokenDistributionWithRegistry.isFinished.call();
-        assert.equal(isFinished, true);
+        expect(isFinished).to.be.true();
 
         try {
           const newEthValue = new BigNumber(1);
@@ -526,13 +535,13 @@ contract('CrowdsaleWithRegistry', (accounts: string[]) => {
         const finalTakerEthBalance = await getEthBalanceAsync(taker);
         const ethSpentOnGas = mul(receipt.gasUsed, gasPrice);
 
-        assert.equal(finalBalances[maker][validOrder.params.makerToken],
-                     sub(initBalances[maker][validOrder.params.makerToken], zrxValue));
-        assert.equal(finalBalances[maker][validOrder.params.takerToken],
-                     add(initBalances[maker][validOrder.params.takerToken], ethValue));
-        assert.equal(finalBalances[taker][validOrder.params.makerToken],
-                     add(initBalances[taker][validOrder.params.makerToken], zrxValue));
-        assert.equal(finalTakerEthBalance, sub(sub(initTakerEthBalance, ethValue), ethSpentOnGas));
+        expect(finalBalances[maker][validOrder.params.makerToken])
+            .to.be.equal(sub(initBalances[maker][validOrder.params.makerToken], zrxValue));
+        expect(finalBalances[maker][validOrder.params.takerToken])
+            .to.be.equal(add(initBalances[maker][validOrder.params.takerToken], ethValue));
+        expect(finalBalances[taker][validOrder.params.makerToken])
+            .to.be.equal(add(initBalances[taker][validOrder.params.makerToken], zrxValue));
+        expect(finalTakerEthBalance).to.be.bignumber.equal(sub(sub(initTakerEthBalance, ethValue), ethSpentOnGas));
       });
     });
   });
