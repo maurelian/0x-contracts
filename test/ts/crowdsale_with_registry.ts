@@ -398,7 +398,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     it('should set a new capPerAddress if called by owner', async () => {
       const newCapPerAddress = new BigNumber(web3Instance.toWei(1.1, 'ether'));
       await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
-      capPerAddress = new BigNumber(await tokenDistributionWithRegistry.capPerAddress.call());
+      capPerAddress = new BigNumber(await tokenDistributionWithRegistry.ethCapPerAddress.call());
       expect(newCapPerAddress).to.be.bignumber.equal(capPerAddress);
     });
   });
