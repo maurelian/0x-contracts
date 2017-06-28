@@ -81,6 +81,8 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
       capPerAddress,
     );
 
+    console.log(tokenDistributionWithRegistry);
+
     validOrderParams = {
       exchangeContractAddress: Exchange.address,
       maker,
@@ -296,7 +298,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   describe('registerAddress', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await tokenDistributionWithRegistry.registerAddress(taker, { from: notOwner });
+        await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: notOwner });
         throw new Error('registerAddress succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -304,11 +306,11 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     });
 
     it('should register an address if called by owner', async () => {
-      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: owner });
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.true();
 
-      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, false, { from: owner });
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.false();
     });
@@ -317,7 +319,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   describe('registerAddresses', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await tokenDistributionWithRegistry.registerAddresses([taker], { from: notOwner });
+        await tokenDistributionWithRegistry.changeRegistrationStatuses([taker], true, { from: notOwner });
         throw new Error('registerAddresses succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -325,13 +327,13 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     });
 
     it('should register addresses if called by owner', async () => {
-      await tokenDistributionWithRegistry.registerAddresses([maker, taker], { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], true, { from: owner });
       let isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.true();
       expect(isTakerRegistered).to.be.true();
 
-      await tokenDistributionWithRegistry.deregisterAddresses([maker, taker], { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], false, { from: owner });
       isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.false();
@@ -342,7 +344,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   describe('deregisterAddress', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await tokenDistributionWithRegistry.deregisterAddress(taker, { from: notOwner });
+        await tokenDistributionWithRegistry.changeRegistrationStatus(taker, false, { from: notOwner });
         throw new Error('deregisterAddress succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -350,10 +352,10 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     });
 
     it('should deregister an address if called by owner', async () => {
-      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: owner });
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.true();
-      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, false{ from: owner });
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isTakerRegistered).to.be.false();
     });
@@ -362,7 +364,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   describe('deregisterAddresses', () => {
     it('should throw if not called by owner', async () => {
       try {
-        await tokenDistributionWithRegistry.deregisterAddresses([taker], { from: notOwner });
+        await tokenDistributionWithRegistry.changeRegistrationStatuses([taker], false, { from: notOwner });
         throw new Error('deregisterAddresses succeeded when it should have thrown');
       } catch (err) {
         testUtil.assertThrow(err);
@@ -370,13 +372,13 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     });
 
     it('should deregister addresses if called by owner', async () => {
-      await tokenDistributionWithRegistry.registerAddresses([maker, taker], { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], true, { from: owner });
       let isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       let isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.true();
       expect(isTakerRegistered).to.be.true();
 
-      await tokenDistributionWithRegistry.deregisterAddresses([maker, taker], { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatuses([maker, taker], false, { from: owner });
       isMakerRegistered = await tokenDistributionWithRegistry.registered.call(maker);
       isTakerRegistered = await tokenDistributionWithRegistry.registered.call(taker);
       expect(isMakerRegistered).to.be.false();
@@ -413,7 +415,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: owner });
 
       validOrderParams = {
         exchangeContractAddress: Exchange.address,
@@ -452,7 +454,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: owner });
       try {
         const ethValue = new BigNumber(1);
         await tokenDistributionWithRegistry.fillOrderWithEth({
@@ -466,7 +468,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     });
 
     it('should throw if the caller is not registered', async () => {
-      await tokenDistributionWithRegistry.deregisterAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, false, { from: owner });
       try {
         const ethValue = new BigNumber(1);
         await tokenDistributionWithRegistry.fillOrderWithEth({
@@ -603,7 +605,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         capPerAddress,
         { from: owner },
       );
-      await tokenDistributionWithRegistry.registerAddress(taker, { from: owner });
+      await tokenDistributionWithRegistry.changeRegistrationStatus(taker, true, { from: owner });
 
       validOrderParams = {
         exchangeContractAddress: Exchange.address,
