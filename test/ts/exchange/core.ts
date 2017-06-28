@@ -160,13 +160,13 @@ contract('Exchange', (accounts: string[]) => {
         takerTokenAmount: toSmallestUnits(100),
       });
 
-      const filledTakerTokenAmountBefore = await exchange.filled.call(order.params.orderHashHex);
+      const filledTakerTokenAmountBefore = new BigNumber(await exchange.filled.call(order.params.orderHashHex));
       expect(filledTakerTokenAmountBefore, 'filledTakerTokenAmountBefore should be 0').to.be.bignumber.equal(0);
 
       const fillTakerTokenAmount = order.params.takerTokenAmount.div(2);
       await exWrapper.fillOrderAsync(order, taker, { fillTakerTokenAmount });
 
-      const filledTakerTokenAmountAfter = await exchange.filled.call(order.params.orderHashHex);
+      const filledTakerTokenAmountAfter = new BigNumber(await exchange.filled.call(order.params.orderHashHex));
       expect(
           filledTakerTokenAmountAfter,
           'filledTakerTokenAmountAfter should be same as fillTakerTokenAmount',
@@ -198,13 +198,13 @@ contract('Exchange', (accounts: string[]) => {
         takerTokenAmount: toSmallestUnits(200),
       });
 
-      const filledTakerTokenAmountBefore = await exchange.filled.call(order.params.orderHashHex);
+      const filledTakerTokenAmountBefore = new BigNumber(await exchange.filled.call(order.params.orderHashHex));
       expect(filledTakerTokenAmountBefore, 'filledTakerTokenAmountBefore should be 0').to.be.bignumber.equal(0);
 
       const fillTakerTokenAmount = order.params.takerTokenAmount.div(2);
       await exWrapper.fillOrderAsync(order, taker, { fillTakerTokenAmount });
 
-      const filledTakerTokenAmountAfter = await exchange.filled.call(order.params.orderHashHex);
+      const filledTakerTokenAmountAfter = new BigNumber(await exchange.filled.call(order.params.orderHashHex));
       expect(filledTakerTokenAmountAfter, 'filledTakerTokenAmountAfter should be same as fillTakerTokenAmount')
         .to.be.bignumber.equal(fillTakerTokenAmount.toString());
 
@@ -278,7 +278,7 @@ contract('Exchange', (accounts: string[]) => {
 
       const res = await exWrapper.fillOrderAsync(order, taker, { fillTakerTokenAmount: order.params.takerTokenAmount });
 
-      expect(res.logs[0].args.filledTakerTokenAmount)
+      expect(res.logs[0].args.filledTakerTokenAmount.toString())
         .to.be.bignumber.equal(sub(order.params.takerTokenAmount, fillTakerTokenAmount));
       const newBalances = await dmyBalances.getAsync();
 
