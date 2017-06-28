@@ -31,7 +31,7 @@ const { add, sub, mul, div, cmp, toSmallestUnits } = BNUtil;
 // with type `any` to a variable of type `Web3`.
 const web3Instance: Web3 = web3;
 
-contract('CrowdsaleWithRegistry', (accounts: string[]) => {
+contract('TokenDistributionWithRegistry', (accounts: string[]) => {
   const maker = accounts[0];
   const taker = accounts[1];
   const owner = accounts[0];
