@@ -219,13 +219,14 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
       expect(logArgs.makerToken).to.be.equal(validOrder.params.makerToken);
       expect(logArgs.takerToken).to.be.equal(validOrder.params.takerToken);
       expect(logArgs.feeRecipient).to.be.equal(validOrder.params.feeRecipient);
-      expect(logArgs.makerTokenAmount).to.be.bignumber.equal(validOrder.params.makerTokenAmount);
-      expect(logArgs.takerTokenAmount).to.be.bignumber.equal(validOrder.params.takerTokenAmount);
-      expect(logArgs.makerFee).to.be.bignumber.equal(validOrder.params.makerFee);
-      expect(logArgs.takerFee).to.be.bignumber.equal(validOrder.params.takerFee);
-      expect(logArgs.expirationTimestampInSec).to.be.bignumber.equal(validOrder.params.expirationTimestampInSec);
-      expect(logArgs.salt).to.be.bignumber.equal(validOrder.params.salt);
-      expect(logArgs.v).to.be.equal(validOrder.params.v);
+      expect(logArgs.makerTokenAmount.toString()).to.be.bignumber.equal(validOrder.params.makerTokenAmount);
+      expect(logArgs.takerTokenAmount.toString()).to.be.bignumber.equal(validOrder.params.takerTokenAmount);
+      expect(logArgs.makerFee.toString()).to.be.bignumber.equal(validOrder.params.makerFee);
+      expect(logArgs.takerFee.toString()).to.be.bignumber.equal(validOrder.params.takerFee);
+      expect(logArgs.expirationTimestampInSec.toString())
+        .to.be.bignumber.equal(validOrder.params.expirationTimestampInSec);
+      expect(logArgs.salt.toString()).to.be.bignumber.equal(validOrder.params.salt);
+      expect(logArgs.v.toNumber()).to.be.equal(validOrder.params.v);
       expect(logArgs.r).to.be.equal(validOrder.params.r);
       expect(logArgs.s).to.be.equal(validOrder.params.s);
 
@@ -317,7 +318,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
     it('should set a new ethCapPerAddress if called by owner', async () => {
       const newCapPerAddress = new BigNumber(web3Instance.toWei(1.1, 'ether'));
       await tokenDistributionWithRegistry.setCapPerAddress(newCapPerAddress, { from: owner });
-      ethCapPerAddress = await tokenDistributionWithRegistry.ethCapPerAddress.call();
+      ethCapPerAddress = new BigNumber(await tokenDistributionWithRegistry.ethCapPerAddress.call());
       expect(newCapPerAddress).to.be.bignumber.equal(ethCapPerAddress);
     });
   });
@@ -402,7 +403,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         });
 
         const finalBalances: BalancesByOwner = await dmyBalances.getAsync();
-        const finalTakerEthBalance = await getEthBalanceAsync(taker);
+        const finalTakerEthBalance = new BigNumber(await getEthBalanceAsync(taker));
         const ethSpentOnGas = mul(res.receipt.gasUsed, gasPrice);
 
         expect(finalBalances[maker][validOrder.params.makerToken])
@@ -427,7 +428,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         });
 
         const finalBalances: BalancesByOwner = await dmyBalances.getAsync();
-        const finalTakerEthBalance = await getEthBalanceAsync(taker);
+        const finalTakerEthBalance = new BigNumber(await getEthBalanceAsync(taker));
         const ethSpentOnGas = mul(res.receipt.gasUsed, gasPrice);
         const filledZrxValue = ethCapPerAddress;
         const filledEthValue = ethCapPerAddress;
@@ -456,7 +457,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
           gasPrice,
         });
         const finalBalances: BalancesByOwner = await dmyBalances.getAsync();
-        const finalTakerEthBalance = await getEthBalanceAsync(taker);
+        const finalTakerEthBalance = new BigNumber(await getEthBalanceAsync(taker));
         const ethSpentOnGas = mul(res.receipt.gasUsed, gasPrice);
         const filledZrxValue = validOrder.params.makerTokenAmount;
         const filledEthValue = validOrder.params.takerTokenAmount;
@@ -532,7 +533,7 @@ contract('TokenDistributionWithRegistry', (accounts: string[]) => {
         const receipt = await getTransactionReceiptAsync(txHash);
 
         const finalBalances: BalancesByOwner = await dmyBalances.getAsync();
-        const finalTakerEthBalance = await getEthBalanceAsync(taker);
+        const finalTakerEthBalance = new BigNumber(await getEthBalanceAsync(taker));
         const ethSpentOnGas = mul(receipt.gasUsed, gasPrice);
 
         expect(finalBalances[maker][validOrder.params.makerToken])
