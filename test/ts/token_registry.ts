@@ -1,11 +1,15 @@
 import * as _ from 'lodash';
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../util/chai_setup';
 import ethUtil = require('ethereumjs-util');
 import { testUtil } from '../../util/test_util';
 import { TokenRegWrapper } from '../../util/token_registry_wrapper';
 import { ContractInstance } from '../../util/types';
 import { Artifacts } from '../../util/artifacts';
 import { constants } from '../../util/constants';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const { TokenRegistry } = new Artifacts(artifacts);
 
@@ -54,21 +58,21 @@ contract('TokenRegistry', (accounts: string[]) => {
     it('should add token metadata when called by owner', async () => {
       await tokenRegWrapper.addTokenAsync(token, owner);
       const tokenData = await tokenRegWrapper.getTokenMetaDataAsync(token.address);
-      assert.deepEqual(tokenData, token);
+      expect(tokenData).to.deep.equal(token);
     });
   });
 
   describe('getTokenByName', () => {
     it('should return token metadata when given the token name', async () => {
       const tokenData = await tokenRegWrapper.getTokenByNameAsync(token.name);
-      assert.deepEqual(tokenData, token);
+      expect(tokenData).to.deep.equal(token);
     });
   });
 
   describe('getTokenBySymbol', () => {
     it('should return token metadata when given the token symbol', async () => {
       const tokenData = await tokenRegWrapper.getTokenBySymbolAsync(token.symbol);
-      assert.deepEqual(tokenData, token);
+      expect(tokenData).to.deep.equal(token);
     });
   });
 
@@ -85,13 +89,13 @@ contract('TokenRegistry', (accounts: string[]) => {
 
     it('should change the token name when called by owner', async () => {
       const res = await tokenReg.setTokenName(newNameToken.address, newNameToken.name, { from: owner });
-      assert.equal(res.logs.length, 1);
+      expect(res.logs).to.have.lengthOf(1);
       const [newData, oldData] = await Promise.all([
         tokenRegWrapper.getTokenByNameAsync(newNameToken.name),
         tokenRegWrapper.getTokenByNameAsync(token.name),
       ]);
-      assert.deepEqual(newData, newNameToken);
-      assert.deepEqual(oldData, nullToken);
+      expect(newData).to.deep.equal(newNameToken);
+      expect(oldData).to.deep.equal(nullToken);
     });
   });
 
@@ -108,13 +112,13 @@ contract('TokenRegistry', (accounts: string[]) => {
 
     it('should change the token symbol when called by owner', async () => {
       const res = await tokenReg.setTokenSymbol(newSymbolToken.address, newSymbolToken.symbol, { from: owner });
-      assert.equal(res.logs.length, 1);
+      expect(res.logs).to.have.lengthOf(1);
       const [newData, oldData] = await Promise.all([
         tokenRegWrapper.getTokenBySymbolAsync(newSymbolToken.symbol),
         tokenRegWrapper.getTokenBySymbolAsync(token.symbol),
       ]);
-      assert.deepEqual(newData, newSymbolToken);
-      assert.deepEqual(oldData, nullToken);
+      expect(newData).to.deep.equal(newSymbolToken);
+      expect(oldData).to.deep.equal(nullToken);
     });
   });
 
@@ -130,9 +134,9 @@ contract('TokenRegistry', (accounts: string[]) => {
 
     it('should remove token metadata when called by owner', async () => {
       const res = await tokenReg.removeToken(token.address, { from: owner });
-      assert.equal(res.logs.length, 1);
+      expect(res.logs).to.have.lengthOf(1);
       const tokenData = await tokenRegWrapper.getTokenMetaDataAsync(token.address);
-      assert.deepEqual(tokenData, nullToken);
+      expect(tokenData).to.deep.equal(nullToken);
     });
   });
 });

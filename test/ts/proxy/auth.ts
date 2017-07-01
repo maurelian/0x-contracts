@@ -1,7 +1,11 @@
 import * as _ from 'lodash';
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../../util/chai_setup';
 import { testUtil } from '../../../util/test_util';
 import { ContractInstance } from '../../../util/types';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const Proxy = artifacts.require('./db/Proxy.sol');
 
@@ -32,7 +36,7 @@ contract('Proxy', (accounts: string[]) => {
       authorized = notAuthorized;
       notAuthorized = null;
       const isAuthorized = await proxy.authorized.call(authorized);
-      assert(isAuthorized);
+      expect(isAuthorized).to.be.true();
     });
 
     it('should throw if owner attempts to authorize a duplicate address', async () => {
@@ -61,7 +65,7 @@ contract('Proxy', (accounts: string[]) => {
       authorized = null;
 
       const isAuthorized = await proxy.authorized.call(notAuthorized);
-      assert(!isAuthorized);
+      expect(isAuthorized).to.be.false();
     });
 
     it('should throw if owner attempts to remove an address that is not authorized', async () => {
@@ -77,20 +81,20 @@ contract('Proxy', (accounts: string[]) => {
   describe('getAuthorizedAddresses', () => {
     it('should return all authorized addresses', async () => {
       const initial = await proxy.getAuthorizedAddresses();
-      assert.equal(initial.length, 1);
+      expect(initial).to.have.lengthOf(1);
       await proxy.addAuthorizedAddress(notAuthorized, { from: owner });
 
       authorized = notAuthorized;
       notAuthorized = null;
       const afterAdd = await proxy.getAuthorizedAddresses();
-      assert.equal(afterAdd.length, 2);
-      assert(_.includes(afterAdd, authorized));
+      expect(afterAdd).to.have.lengthOf(2);
+      expect(afterAdd).to.include(authorized);
 
       await proxy.removeAuthorizedAddress(authorized, { from: owner });
       notAuthorized = authorized;
       authorized = null;
       const afterRemove = await proxy.getAuthorizedAddresses();
-      assert.equal(afterRemove.length, 1);
+      expect(afterRemove).to.have.lengthOf(1);
     });
   });
 });
