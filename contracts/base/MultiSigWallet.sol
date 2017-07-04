@@ -311,9 +311,10 @@ contract MultiSigWallet {
     function getOwners()
         public
         constant
-        returns (address[])
+        returns (address)
+        // returns (address)[])
     {
-        return owners;
+        return owners[0];
     }
 
     /// @dev Returns array with owner addresses, which confirmed transaction.

@@ -109,8 +109,9 @@ contract Proxy is Ownable {
     /// @return Array of authorized addresses.
     function getAuthorizedAddresses()
         constant
-        returns (address[])
+        // returns (address[])
+        returns (address)
     {
-        return authorities;
+        return authorities[0];
     }
 }

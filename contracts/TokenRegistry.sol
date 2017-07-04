@@ -303,7 +303,8 @@ contract TokenRegistry is Ownable {
 
     /// @dev Returns an array containing all token addresses.
     /// @return Array of token addresses.
-    function getTokenAddresses() constant returns (address[]) {
-        return tokenAddresses;
+    function getTokenAddresses() constant returns (address) {
+    // function getTokenAddresses() constant returns (address[]) {
+        return tokenAddresses[0];
     }
 }
