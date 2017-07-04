@@ -91,6 +91,8 @@ contract('Exchange', (accounts: string[]) => {
   });
 
   describe('internal functions', () => {
+    /* FLAG: Why are these testing to ensure that the exchange functions are 'undefined'?
+    Seems like incomplete tests or somthing. */
     it('should include transferViaProxy', () => {
       assert.equal(exchange.transferViaProxy, undefined);
     });
@@ -624,7 +626,7 @@ contract('Exchange', (accounts: string[]) => {
     });
 
     it('should not log events if no value is cancelled', async () => {
-      await exWrapper.cancelOrderAsync(order, maker);
+      await exWrapper.cancelOrderAsync(order, maker); // FLAG: why is this done twice? 
 
       const res = await exWrapper.cancelOrderAsync(order, maker);
       assert.equal(res.logs.length, 1);

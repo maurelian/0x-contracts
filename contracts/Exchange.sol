@@ -36,6 +36,12 @@ contract Exchange is SafeMath {
     address public PROXY_CONTRACT;
 
     // Mappings of orderHash => amounts of takerTokenAmount filled or cancelled.
+    /* 
+        FLAG: is this sufficient for replay protection? 
+        what is the order is not completely filled? 
+        Is replaying the fill a possible attack against the maker? 
+        IDEA: full replay attack protection. 
+     */
     mapping (bytes32 => uint) public filled;
     mapping (bytes32 => uint) public cancelled;
 
@@ -66,6 +72,15 @@ contract Exchange is SafeMath {
 
     event LogError(uint8 indexed errorId, bytes32 indexed orderHash);
 
+    /* 
+        NOTE: This is an important struct. It has the basic structure which is seen repeated in 
+        function calls of {address[5], uint[5], bytes32}
+        Q: However, it's expressed in the function declarations as {address[5], uint[6]}, is there 
+        any potential for concern with this casting? 
+        A: I don't think so. Looking closer, the final uint value is a secret salt which is used to 
+        derive the bytes32 orderHash
+
+    */
     struct Order {
         address maker;
         address taker;
@@ -98,6 +113,9 @@ contract Exchange is SafeMath {
     /// @param r CDSA signature parameters r.
     /// @param s CDSA signature parameters s.
     /// @return Total amount of takerToken filled in trade.
+    /* 
+        NOTE: the 'Taker' calls this function with the 'Makers'
+     */
     function fillOrder(
           address[5] orderAddresses,
           uint[6] orderValues,
@@ -108,9 +126,10 @@ contract Exchange is SafeMath {
           bytes32 s)
           returns (uint filledTakerTokenAmount)
     {
+        // Question: why do we need `memory` here? 
         Order memory order = Order({
             maker: orderAddresses[0],
-            taker: orderAddresses[1],
+            taker: orderAddresses[1], // NOTE: Used for 'point to point' orders
             makerToken: orderAddresses[2],
             takerToken: orderAddresses[3],
             feeRecipient: orderAddresses[4],
@@ -233,6 +252,7 @@ contract Exchange is SafeMath {
 
         require(order.maker == msg.sender);
 
+        // FLAG: timestamp dependency
         if (block.timestamp >= order.expirationTimestampInSec) {
             LogError(ERROR_ORDER_EXPIRED, order.orderHash);
             return 0;
@@ -421,6 +441,10 @@ contract Exchange is SafeMath {
     /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
     /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
     /// @return Keccak-256 hash of order.
+    /* 
+        NOTE: this is really the first step. The market maker comes here to create the order to be 
+        listed.
+     */
     function getOrderHash(address[5] orderAddresses, uint[6] orderValues)
         constant
         returns (bytes32 orderHash)
@@ -428,6 +452,9 @@ contract Exchange is SafeMath {
         return sha3(
             address(this),
             orderAddresses[0], // maker
+            /* 
+                FLAG: if taker is not declared, the value given would be 0x2.
+            */
             orderAddresses[1], // taker
             orderAddresses[2], // makerToken
             orderAddresses[3], // takerToken
@@ -518,7 +545,7 @@ contract Exchange is SafeMath {
         internal
         returns (bool success)
     {
-        return Proxy(PROXY_CONTRACT).transferFrom(token, from, to, value);
+        return Proxy(PROXY_CONTRACT).transferFrom(token, from, to, value); // FLAG: External call
     }
 
     /// @dev Checks if any order transfers will fail.
@@ -571,7 +598,7 @@ contract Exchange is SafeMath {
         constant
         returns (uint balance)
     {
-        return Token(token).balanceOf(owner);
+        return Token(token).balanceOf(owner); // FLAG: External call
     }
 
     /// @dev Get allowance of token given to PROXY_CONTRACT by an address.
@@ -583,6 +610,6 @@ contract Exchange is SafeMath {
         constant
         returns (uint allowance)
     {
-        return Token(token).allowance(owner, PROXY_CONTRACT);
+        return Token(token).allowance(owner, PROXY_CONTRACT);  // FLAG: External call
     }
 }
