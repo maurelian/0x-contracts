@@ -5,3 +5,4 @@ node_modules
 .soliumrc.json
 migrations/config/multisig.js
 transpiled
+build
