@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/bignumber.js": "^4.0.2",
     "@types/bluebird": "^3.5.3",
+    "@types/chai": "^4.0.1",
     "@types/lodash": "^4.14.63",
     "@types/node": "^7.0.13",
     "@types/request-promise-native": "^1.0.2",
@@ -34,6 +35,8 @@
     "chai-typescript-typings": "^0.0.0",
     "copyfiles": "^1.2.0",
     "dirty-chai": "^2.0.0",
+    "fs": "0.0.1-security",
+    "solc": "^0.4.11",
     "truffle": "3.2.5",
     "typescript": "^2.2.2",
     "web3-typescript-typings": "0.0.3"
@@ -42,6 +45,7 @@
     "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.0",
     "bn.js": "^4.11.6",
+    "crypto-js": "^3.1.9-1",
     "es6-promisify": "^5.0.0",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^5.1.1",
