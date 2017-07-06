@@ -35,7 +35,6 @@
     "chai-typescript-typings": "^0.0.0",
     "copyfiles": "^1.2.0",
     "dirty-chai": "^2.0.0",
-    "fs": "0.0.1-security",
     "solc": "^0.4.11",
     "truffle": "3.2.5",
     "typescript": "^2.2.2",

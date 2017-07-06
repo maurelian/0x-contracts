@@ -1,29 +1,48 @@
 const fs = require('fs');
+const _ = require('lodash');
 const solc = require('solc');
 const Web3 = require('web3');
 const sha3 = require('crypto-js/sha3');
 
-const KOVAN_NETWORK_ID = 42;
+const proxyArtifact = require(`${__dirname}/../build/contracts/Proxy`);
+const tokenRegistryArtifact = require(`${__dirname}/../build/contracts/TokenRegistry`);
+const exchangeArtifact = require(`${__dirname}/../build/contracts/Exchange.json`);
 
-const findImports = path => {
+const KOVAN_NETWORK_ID = 42;
+const JSON_RPC_PORT = 8545;
+const NODE_URL = `http://localhost:${JSON_RPC_PORT}`;
+
+const getContractContents = path => {
   const contents = fs.readFileSync(`${__dirname}/../contracts/${path}`).toString();
   return {contents};
 };
 
-const exchangeContents = fs.readFileSync(`${__dirname}/../contracts/Exchange.sol`).toString();
+const exchangeContents = getContractContents('Exchange.sol').contents;
 const inputs = {'Exchange.sol': exchangeContents};
-const compiled = solc.compile({sources: inputs}, 1, findImports);
+const activateOptimiserFlag = 1;
+const compiledExchange = solc.compile({sources: inputs}, activateOptimiserFlag, getContractContents);
 
-const proxyArtifact = require(`${__dirname}/../build/contracts/Proxy.json`);
-const tokenRegistryArtifact = require(`${__dirname}/../build/contracts/TokenRegistry.json`);
-const proxyKovanAddress = proxyArtifact.networks[KOVAN_NETWORK_ID].address;
-const tokenRegistryKovanAddress = tokenRegistryArtifact.networks[KOVAN_NETWORK_ID].address;
+let proxyKovanAddress;
+let tokenRegistryKovanAddress;
 
-const exchangeABI = JSON.parse(compiled.contracts['Exchange.sol:Exchange'].interface);
-const exchangeBytecode = `0x${compiled.contracts['Exchange.sol:Exchange'].bytecode}`;
+try {
+  proxyKovanAddress = proxyArtifact.networks[KOVAN_NETWORK_ID].address;
+} catch (err) {
+  throw new Error(`Proxy not deployed on network ${KOVAN_NETWORK_ID}`);
+}
+
+try {
+  tokenRegistryKovanAddress = tokenRegistryArtifact.networks[KOVAN_NETWORK_ID].address;
+} catch (err) {
+  throw new Error(`TokenRegistry not deployed on network ${KOVAN_NETWORK_ID}`);
+}
+
+const exchangeContractReference = 'Exchange.sol:Exchange';
+const exchangeABI = JSON.parse(compiledExchange.contracts[exchangeContractReference].interface);
+const exchangeBytecode = `0x${compiledExchange.contracts[exchangeContractReference].bytecode}`;
 const tokenRegistryABI = tokenRegistryArtifact.abi;
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+const web3 = new Web3(new Web3.providers.HttpProvider(NODE_URL));
 const TokenRegistryContract = web3.eth.contract(tokenRegistryABI);
 const tokenRegistryInstance = TokenRegistryContract.at(tokenRegistryKovanAddress);
 
@@ -35,35 +54,39 @@ web3.eth.getAccounts((err, accounts) => {
     }
     const ExchangeContract = web3.eth.contract(exchangeABI);
     const gasEstimate = web3.eth.estimateGas({data: exchangeBytecode});
+    const additionalGas = 500000;
     ExchangeContract.new(zrxTokenAddress, proxyKovanAddress, {
       data: exchangeBytecode,
       from: owner,
-      gas: gasEstimate + 500000,
+      gas: gasEstimate + additionalGas,
     }, (err, exchangeContractInstance) => {
-      if (err) {
-        console.log(err);
+      if (err && !exchangeContractInstance) {
+        console.log(`Error encountered: ${err}`);
       } else if (!exchangeContractInstance.address) {
         console.log(`transactionHash: ${exchangeContractInstance.transactionHash}`);
       } else {
-        console.log(`address: ${exchangeContractInstance.address}`);
-        const exchangeArtifact = require(`${__dirname}/../build/contracts/Exchange.json`);
-        const newExchangeArtifact = Object.assign({}, exchangeArtifact);
-        newExchangeArtifact.abi = exchangeABI;
-        newExchangeArtifact.unlinked_binary = exchangeBytecode;
-        const network = newExchangeArtifact.networks[KOVAN_NETWORK_ID];
+        console.log(`Exchange address: ${exchangeContractInstance.address}`);
+
+        const kovanSpecificExchangeArtifact = _.assign({}, exchangeArtifact);
+        kovanSpecificExchangeArtifact.abi = exchangeABI;
+        kovanSpecificExchangeArtifact.unlinked_binary = exchangeBytecode;
+        const network = kovanSpecificExchangeArtifact.networks[KOVAN_NETWORK_ID];
         network.address = exchangeContractInstance.address;
         network.updated_at = new Date().getTime();
-        const networkEvents = Object.keys(network.events);
-        networkEvents.forEach(event => {
+        const networkEvents = _.keys(network.events);
+        _.each(networkEvents, event => {
           delete network.events[event];
         });
-        exchangeABI.forEach(item => {
+        _.each(exchangeABI, item => {
           if (item.type === 'event') {
-            const signature = `${item.name}(${item.inputs.map(param => param.type).join(',')})`;
-            network.events[`0x${sha3(signature, {outputLength: 256})}`] = item;
+            const paramTypes = item.inputs.map(param => param.type).join(',');
+            const signature = `${item.name}(${paramTypes})`;
+            const outputLength = 256;
+            network.events[`0x${sha3(signature, {outputLength})}`] = item;
           }
         });
-        fs.writeFile(`${__dirname}/../build/contracts/Exchange.json`, JSON.stringify(newExchangeArtifact), (err) => {
+
+        fs.writeFile(`${__dirname}/../build/contracts/Exchange.json`, JSON.stringify(kovanSpecificExchangeArtifact), (err) => {
           if (err) {
             throw err;
           }
