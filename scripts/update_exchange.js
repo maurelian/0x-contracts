@@ -67,26 +67,26 @@ web3.eth.getAccounts((err, accounts) => {
       } else {
         console.log(`Exchange address: ${exchangeContractInstance.address}`);
 
-        const kovanSpecificExchangeArtifact = _.assign({}, exchangeArtifact);
-        kovanSpecificExchangeArtifact.abi = exchangeABI;
-        kovanSpecificExchangeArtifact.unlinked_binary = exchangeBytecode;
-        const network = kovanSpecificExchangeArtifact.networks[KOVAN_NETWORK_ID];
-        network.address = exchangeContractInstance.address;
-        network.updated_at = new Date().getTime();
-        const networkEvents = _.keys(network.events);
-        _.each(networkEvents, event => {
-          delete network.events[event];
+        const newExchangeArtifact = _.assign({}, exchangeArtifact);
+        newExchangeArtifact.abi = exchangeABI;
+        newExchangeArtifact.unlinked_binary = exchangeBytecode;
+        const kovanSpecificExchangeArtifact = newExchangeArtifact.networks[KOVAN_NETWORK_ID];
+        kovanSpecificExchangeArtifact.address = exchangeContractInstance.address;
+        kovanSpecificExchangeArtifact.updated_at = new Date().getTime();
+        const kovanNetworkEvents = _.keys(kovanSpecificExchangeArtifact.events);
+        _.each(kovanNetworkEvents, event => {
+          delete kovanSpecificExchangeArtifact.events[event];
         });
         _.each(exchangeABI, item => {
           if (item.type === 'event') {
             const paramTypes = item.inputs.map(param => param.type).join(',');
             const signature = `${item.name}(${paramTypes})`;
             const outputLength = 256;
-            network.events[`0x${sha3(signature, {outputLength})}`] = item;
+            kovanSpecificExchangeArtifact.events[`0x${sha3(signature, {outputLength})}`] = item;
           }
         });
 
-        fs.writeFile(`${__dirname}/../build/contracts/Exchange.json`, JSON.stringify(kovanSpecificExchangeArtifact), (err) => {
+        fs.writeFile(`${__dirname}/../build/contracts/Exchange.json`, JSON.stringify(newExchangeArtifact), (err) => {
           if (err) {
             throw err;
           }
