@@ -21,7 +21,7 @@
 * [Protocol Specification](#protocol-specification)
     * [Message Format](#message-format)
 * [Setup](#setup)
-    * [Installing Dependencies](#install-dependencies)
+    * [Installing Dependencies](#installing-dependencies)
     * [Running Tests](#running-tests)
     * [Contributing](#contributing)
 
