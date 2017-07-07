@@ -12,7 +12,7 @@
     "compile": "rm -rf build/contracts; truffle compile",
     "migrate": "npm run transpile; truffle migrate",
     "deploy": "npm run transpile; truffle migrate --network kovan",
-    "testrpc": "node node_modules/ethereumjs-testrpc/build/cli.node.js --networkId 50"
+    "testrpc": "testrpc --networkId 50"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,6 @@
   "devDependencies": {
     "@types/bignumber.js": "^4.0.2",
     "@types/bluebird": "^3.5.3",
-    "@types/chai": "^4.0.1",
     "@types/lodash": "^4.14.63",
     "@types/node": "^7.0.13",
     "@types/request-promise-native": "^1.0.2",
