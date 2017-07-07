@@ -1,10 +1,14 @@
-import * as assert from 'assert';
+import * as chai from 'chai';
+import {chaiSetup} from '../../../util/chai_setup';
 import ethUtil = require('ethereumjs-util');
 import { BNUtil } from '../../../util/bn_util';
 import { ExchangeWrapper } from '../../../util/exchange_wrapper';
 import { OrderFactory } from '../../../util/order_factory';
 import { Order } from '../../../util/order';
 import { Artifacts } from '../../../util/artifacts';
+
+chaiSetup.configure();
+const expect = chai.expect;
 
 const {
   Exchange,
@@ -32,15 +36,15 @@ contract('Exchange', (accounts: string[]) => {
       tokenRegistry.getTokenAddressBySymbol('DGD'),
     ]);
     const defaultOrderParams = {
-      exchange: Exchange.address,
+      exchangeContractAddress: Exchange.address,
       maker,
       feeRecipient,
-      tokenM: repAddress,
-      tokenT: dgdAddress,
-      valueM: toSmallestUnits(100),
-      valueT: toSmallestUnits(200),
-      feeM: toSmallestUnits(1),
-      feeT: toSmallestUnits(1),
+      makerToken: repAddress,
+      takerToken: dgdAddress,
+      makerTokenAmount: toSmallestUnits(100),
+      takerTokenAmount: toSmallestUnits(200),
+      makerFee: toSmallestUnits(1),
+      takerFee: toSmallestUnits(1),
     };
     orderFactory = new OrderFactory(defaultOrderParams);
   });
@@ -52,7 +56,7 @@ contract('Exchange', (accounts: string[]) => {
   describe('getOrderHash', () => {
     it('should output the correct orderHash', async () => {
       const orderHashHex = await exWrapper.getOrderHashAsync(order);
-      assert.equal(order.params.orderHashHex, orderHashHex);
+      expect(order.params.orderHashHex).to.be.equal(orderHashHex);
     });
   });
 
@@ -64,16 +68,16 @@ contract('Exchange', (accounts: string[]) => {
     it('should return true with a valid signature', async () => {
       const success = await exWrapper.isValidSignatureAsync(order);
       const isValidSignature = order.isValidSignature();
-      assert(isValidSignature);
-      assert(success);
+      expect(isValidSignature).to.be.true();
+      expect(success).to.be.true();
     });
 
     it('should return false with an invalid signature', async () => {
       order.params.r = ethUtil.bufferToHex(ethUtil.sha3('invalidR'));
       order.params.s = ethUtil.bufferToHex(ethUtil.sha3('invalidS'));
       const success = await exWrapper.isValidSignatureAsync(order);
-      assert(!order.isValidSignature());
-      assert(!success);
+      expect(order.isValidSignature()).to.be.false();
+      expect(success).to.be.false();
     });
   });
 });

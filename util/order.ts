@@ -36,8 +36,7 @@ export class Order {
     // the personal message header before sending the request, whereas testrpc does not.
     // TODO: In order to run the tests against any client, add client detection and conditionally add the
     // personal message header when needed.
-    const msgHash = ethUtil.hashPersonalMessage(orderHash);
-    const signature = await promisify(web3Instance.eth.sign)(this.params.maker, ethUtil.bufferToHex(msgHash));
+    const signature = await promisify(web3Instance.eth.sign)(this.params.maker, ethUtil.bufferToHex(orderHash));
     const { v, r, s } = ethUtil.fromRpcSig(signature);
     this.params = _.assign(this.params, {
       orderHashHex: ethUtil.bufferToHex(orderHash),
@@ -46,65 +45,65 @@ export class Order {
       s: ethUtil.bufferToHex(s),
     });
   }
-  public createFill(shouldCheckTransfer?: boolean, fillValueT?: BigNumber.BigNumber) {
+  public createFill(shouldThrowOnInsufficientBalanceOrAllowance?: boolean, fillTakerTokenAmount?: BigNumber.BigNumber) {
     const fill = {
       orderAddresses: [
         this.params.maker,
         this.params.taker,
-        this.params.tokenM,
-        this.params.tokenT,
+        this.params.makerToken,
+        this.params.takerToken,
         this.params.feeRecipient,
       ],
       orderValues: [
-        this.params.valueM,
-        this.params.valueT,
-        this.params.feeM,
-        this.params.feeT,
-        this.params.expiration,
+        this.params.makerTokenAmount,
+        this.params.takerTokenAmount,
+        this.params.makerFee,
+        this.params.takerFee,
+        this.params.expirationTimestampInSec,
         this.params.salt,
       ],
-      fillValueT: fillValueT || this.params.valueT,
-      shouldCheckTransfer: !!shouldCheckTransfer,
+      fillTakerTokenAmount: fillTakerTokenAmount || this.params.takerTokenAmount,
+      shouldThrowOnInsufficientBalanceOrAllowance: !!shouldThrowOnInsufficientBalanceOrAllowance,
       v: this.params.v,
       r: this.params.r,
       s: this.params.s,
     };
     return fill;
   }
-  public createCancel(cancelValueT?: BigNumber.BigNumber) {
+  public createCancel(cancelTakerTokenAmount?: BigNumber.BigNumber) {
     const cancel = {
       orderAddresses: [
         this.params.maker,
         this.params.taker,
-        this.params.tokenM,
-        this.params.tokenT,
+        this.params.makerToken,
+        this.params.takerToken,
         this.params.feeRecipient,
       ],
       orderValues: [
-        this.params.valueM,
-        this.params.valueT,
-        this.params.feeM,
-        this.params.feeT,
-        this.params.expiration,
+        this.params.makerTokenAmount,
+        this.params.takerTokenAmount,
+        this.params.makerFee,
+        this.params.takerFee,
+        this.params.expirationTimestampInSec,
         this.params.salt,
       ],
-      cancelValueT: cancelValueT || this.params.valueT,
+      cancelTakerTokenAmount: cancelTakerTokenAmount || this.params.takerTokenAmount,
     };
     return cancel;
   }
   private getOrderHash() {
     const orderHash = crypto.solSHA3([
-      this.params.exchange,
+      this.params.exchangeContractAddress,
       this.params.maker,
       this.params.taker,
-      this.params.tokenM,
-      this.params.tokenT,
+      this.params.makerToken,
+      this.params.takerToken,
       this.params.feeRecipient,
-      this.params.valueM,
-      this.params.valueT,
-      this.params.feeM,
-      this.params.feeT,
-      this.params.expiration,
+      this.params.makerTokenAmount,
+      this.params.takerTokenAmount,
+      this.params.makerFee,
+      this.params.takerFee,
+      this.params.expirationTimestampInSec,
       this.params.salt,
     ]);
     return orderHash;

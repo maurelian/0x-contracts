@@ -11,7 +11,8 @@
     "test": "npm run transpile; truffle test",
     "compile": "rm -rf build/contracts; truffle compile",
     "migrate": "npm run transpile; truffle migrate",
-    "deploy": "npm run transpile; truffle migrate --network kovan"
+    "deploy": "npm run transpile; truffle migrate --network kovan",
+    "testrpc": "testrpc --networkId 50"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,14 @@
     "@types/lodash": "^4.14.63",
     "@types/node": "^7.0.13",
     "@types/request-promise-native": "^1.0.2",
+    "chai": "^4.0.2",
+    "chai-bignumber": "0xproject/chai-bignumber",
+    "chai-typescript-typings": "^0.0.0",
     "copyfiles": "^1.2.0",
-    "truffle": "3.2.1",
+    "dirty-chai": "^2.0.0",
+    "solc": "^0.4.11",
+    "ethereumjs-testrpc": "4.0.1",
+    "truffle": "3.4.3",
     "typescript": "^2.2.2",
     "web3-typescript-typings": "0.0.3"
   },
@@ -38,6 +45,7 @@
     "bignumber.js": "^4.0.0",
     "bluebird": "^3.5.0",
     "bn.js": "^4.11.6",
+    "crypto-js": "^3.1.9-1",
     "es6-promisify": "^5.0.0",
     "ethereumjs-abi": "^0.6.4",
     "ethereumjs-util": "^5.1.1",
