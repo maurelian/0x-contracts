@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>0/10</span>
+        <span class='fraction'>10/10</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>0/10</span>
+        <span class='fraction'>10/10</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -92,21 +92,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">8×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.11;
@@ -119,27 +119,27 @@ contract DummyToken is Mintable, Ownable {
     string public symbol;
     uint public decimals;
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function DummyToken(</span>
+    function DummyToken(
         string _name,
         string _symbol,
         uint _decimals,
         uint _totalSupply)
     {
-<span class="cstat-no" title="statement not covered" >        name = _name</span>;
-<span class="cstat-no" title="statement not covered" >        symbol = _symbol</span>;
-<span class="cstat-no" title="statement not covered" >        decimals = _decimals</span>;
-<span class="cstat-no" title="statement not covered" >        totalSupply = _totalSupply</span>;
-<span class="cstat-no" title="statement not covered" >        balances[msg.sender] = _totalSupply</span>;
+        name = _name;
+        symbol = _symbol;
+        decimals = _decimals;
+        totalSupply = _totalSupply;
+        balances[msg.sender] = _totalSupply;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function setBalance(address _target, uint _value) onlyOwner</span> {
-<span class="cstat-no" title="statement not covered" >        uint currBalance = balanceOf(_target)</span>;
-<span class="cstat-no" title="statement not covered" >        if (_value &lt; currBalance) {</span>
-<span class="cstat-no" title="statement not covered" >            totalSupply = safeSub(totalSupply, safeSub(currBalance, _value))</span>;
+    function setBalance(address _target, uint _value) onlyOwner {
+        uint currBalance = balanceOf(_target);
+        if (_value &lt; currBalance) {
+            totalSupply = safeSub(totalSupply, safeSub(currBalance, _value));
         } else {
-<span class="cstat-no" title="statement not covered" >            totalSupply = safeAdd(totalSupply, safeSub(_value, currBalance))</span>;
+            totalSupply = safeAdd(totalSupply, safeSub(_value, currBalance));
         }
-<span class="cstat-no" title="statement not covered" >        balances[_target] = _value</span>;
+        balances[_target] = _value;
     }
 }
 &nbsp;</pre></td></tr>
@@ -148,7 +148,7 @@ contract DummyToken is Mintable, Ownable {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 10:06:17 GMT-0400 (EDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:29:58 GMT-0400 (EDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

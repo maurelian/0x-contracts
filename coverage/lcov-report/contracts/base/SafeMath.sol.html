@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">78.57% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>0/14</span>
+        <span class='fraction'>11/14</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,18 +30,18 @@
         <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">62.5% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/8</span>
+        <span class='fraction'>5/8</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">78.57% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>0/14</span>
+        <span class='fraction'>11/14</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -88,29 +88,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-yes">34×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-yes">24×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -123,31 +119,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.11;
 &nbsp;
 contract SafeMath {
-<span class="fstat-no" title="function not covered" >    function safeMul(uint a, uint b) internal constant returns (uint)</span> {
-<span class="cstat-no" title="statement not covered" >        uint c = a * b</span>;
-<span class="cstat-no" title="statement not covered" >        assert(a == 0 || c / a == b)</span>;
-<span class="cstat-no" title="statement not covered" >        return c;</span>
+    function safeMul(uint a, uint b) internal constant returns (uint) {
+        uint c = a * b;
+        assert(a == 0 || c / a == b);
+        return c;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function safeDiv(uint a, uint b) internal constant returns (uint)</span> {
-<span class="cstat-no" title="statement not covered" >        uint c = a / b</span>;
-<span class="cstat-no" title="statement not covered" >        return c;</span>
+    function safeDiv(uint a, uint b) internal constant returns (uint) {
+        uint c = a / b;
+        return c;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function safeSub(uint a, uint b) internal constant returns (uint)</span> {
-<span class="cstat-no" title="statement not covered" >        assert(b &lt;= a)</span>;
-<span class="cstat-no" title="statement not covered" >        return a - b;</span>
+    function safeSub(uint a, uint b) internal constant returns (uint) {
+        assert(b &lt;= a);
+        return a - b;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function safeAdd(uint a, uint b) internal constant returns (uint)</span> {
-<span class="cstat-no" title="statement not covered" >        uint c = a + b</span>;
-<span class="cstat-no" title="statement not covered" >        assert(c &gt;= a)</span>;
-<span class="cstat-no" title="statement not covered" >        return c;</span>
+    function safeAdd(uint a, uint b) internal constant returns (uint) {
+        uint c = a + b;
+        assert(c &gt;= a);
+        return c;
     }
 &nbsp;
 <span class="fstat-no" title="function not covered" >    function max64(uint64 a, uint64 b) internal constant returns (uint64)</span> {
@@ -162,8 +162,8 @@ contract SafeMath {
 <span class="cstat-no" title="statement not covered" >        return a &gt;= b ? a : b;</span>
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    function min256(uint256 a, uint256 b) internal constant returns (uint256)</span> {
-<span class="cstat-no" title="statement not covered" >        return a &lt; b ? a : b;</span>
+    function min256(uint256 a, uint256 b) internal constant returns (uint256) {
+        return a &lt; b ? a : b;
     }
 }
 &nbsp;</pre></td></tr>
@@ -172,7 +172,7 @@ contract SafeMath {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 10:06:17 GMT-0400 (EDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:29:58 GMT-0400 (EDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

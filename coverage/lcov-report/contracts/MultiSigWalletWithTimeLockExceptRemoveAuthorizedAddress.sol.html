@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">85.71% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>0/14</span>
+        <span class='fraction'>12/14</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>1/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/4</span>
+        <span class='fraction'>4/4</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">86.67% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>0/15</span>
+        <span class='fraction'>13/15</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -116,10 +116,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -135,7 +135,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,29 +146,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.11;
@@ -179,10 +179,10 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
 &nbsp;
     address public PROXY_CONTRACT;
 &nbsp;
-<span class="fstat-no" title="function not covered" >    modifier validRemoveAuthorizedAddressTx(uint transactionId)</span> {
-<span class="cstat-no" title="statement not covered" >        Transaction tx = transactions[transactionId]</span>;
-<span class="cstat-no" title="statement not covered" >        assert(tx.destination == PROXY_CONTRACT)</span>;
-<span class="cstat-no" title="statement not covered" >        assert(isFunctionRemoveAuthorizedAddress(tx.data))</span>;
+    modifier validRemoveAuthorizedAddressTx(uint transactionId) {
+        Transaction tx = transactions[transactionId];
+        assert(tx.destination == PROXY_CONTRACT);
+        assert(isFunctionRemoveAuthorizedAddress(tx.data));
         _;
     }
 &nbsp;
@@ -191,7 +191,7 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
     /// @param _required Number of required confirmations.
     /// @param _secondsTimeLocked Duration needed after a transaction is confirmed and before it becomes executable, in seconds.
     /// @param _proxy Address of Proxy contract.
-<span class="fstat-no" title="function not covered" >    function MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress(</span>
+    function MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress(
         address[] _owners,
         uint _required,
         uint _secondsTimeLocked,
@@ -199,21 +199,21 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
         public
         MultiSigWalletWithTimeLock(_owners, _required, _secondsTimeLocked)
     {
-<span class="cstat-no" title="statement not covered" >        PROXY_CONTRACT = _proxy</span>;
+        PROXY_CONTRACT = _proxy;
     }
 &nbsp;
     /// @dev Allows execution of removeAuthorizedAddress without time lock.
     /// @param transactionId Transaction ID.
-<span class="fstat-no" title="function not covered" >    function executeRemoveAuthorizedAddress(uint transactionId)</span>
+    function executeRemoveAuthorizedAddress(uint transactionId)
         public
         notExecuted(transactionId)
         confirmationTimeSet(transactionId)
         validRemoveAuthorizedAddressTx(transactionId)
     {
-<span class="cstat-no" title="statement not covered" >        Transaction tx = transactions[transactionId]</span>;
-<span class="cstat-no" title="statement not covered" >        tx.executed = true</span>;
-<span class="cstat-no" title="statement not covered" >        if (tx.destination.call.value(tx.value)(tx.data))</span>
-<span class="cstat-no" title="statement not covered" >            Execution(transactionId)</span>;
+        Transaction tx = transactions[transactionId];
+        tx.executed = true;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (tx.destination.call.value(tx.value)(tx.data))
+            Execution(transactionId);
         else {
 <span class="cstat-no" title="statement not covered" >            ExecutionFailure(transactionId)</span>;
 <span class="cstat-no" title="statement not covered" >            tx.executed = false</span>;
@@ -223,16 +223,16 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
     /// @dev Compares first 4 bytes of byte array to removeAuthorizedAddress function signature.
     /// @param data Transaction data.
     /// @return Successful if data is a call to removeAuthorizedAddress.
-<span class="fstat-no" title="function not covered" >    function isFunctionRemoveAuthorizedAddress(bytes data)</span>
+    function isFunctionRemoveAuthorizedAddress(bytes data)
         public
         constant
         returns (bool)
     {
-<span class="cstat-no" title="statement not covered" >        bytes4 removeAuthorizedAddressSignature = bytes4(sha3("removeAuthorizedAddress(address)"))</span>;
-<span class="cstat-no" title="statement not covered" >        for (uint i = 0; i &lt; 4; i++) {</span>
-<span class="cstat-no" title="statement not covered" >            assert(data[i] == removeAuthorizedAddressSignature[i])</span>;
+        bytes4 removeAuthorizedAddressSignature = bytes4(sha3("removeAuthorizedAddress(address)"));
+        for (uint i = 0; i &lt; 4; i++) {
+            assert(data[i] == removeAuthorizedAddressSignature[i]);
         }
-<span class="cstat-no" title="statement not covered" >        return true;</span>
+        return true;
     }
 }
 &nbsp;</pre></td></tr>
@@ -241,7 +241,7 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 10:06:17 GMT-0400 (EDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:29:58 GMT-0400 (EDT)
 </div>
 </div>
 <script src="../prettify.js"></script>
