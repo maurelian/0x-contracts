@@ -7,11 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "transpile": "rm -rf ./transpiled; ./node_modules/.bin/copyfiles ./build/**/* ./transpiled; ./node_modules/.bin/tsc",
-    "test": "npm run transpile; truffle test",
-    "compile": "rm -rf build/contracts; truffle compile",
-    "migrate": "npm run transpile; truffle migrate",
-    "deploy": "npm run transpile; truffle migrate --network kovan"
+    "transpile": "rm -rf ./transpiled; ./node_modules/.bin/copyfiles ./build/**/* ./transpiled; ./node_modules/.bin/tsc -p .",
+    "test": "npm run transpile; ./node_modules/.bin/truffle test",
+    "compile": "rm -rf build/contracts; ./node_modules/.bin/truffle compile",
+    "migrate": "npm run transpile; ./node_modules/.bin/truffle migrate",
+    "deploy": "npm run transpile; ./node_modules/.bin/truffle migrate --network kovan"
   },
   "repository": {
     "type": "git",
