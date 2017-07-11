@@ -225,7 +225,7 @@ contract MultiSigWallet {
         if (isConfirmed(transactionId)) {
             Transaction tx = transactions[transactionId];
             tx.executed = true;
-            if (tx.destination.call.value(tx.value)(tx.data))
+            if (tx.destination.call.value(tx.value)(tx.data)) // FLAG: External
                 Execution(transactionId);
             else {
                 ExecutionFailure(transactionId);

@@ -16,6 +16,10 @@
 
 */
 
+// FLAG: who is intended to own this?
+// What is it mean to prevent? All tx, or just eth sends?
+
+
 pragma solidity ^0.4.11;
 
 import "./base/MultiSigWallet.sol";
@@ -83,6 +87,8 @@ contract MultiSigWalletWithTimeLock is MultiSigWallet {
         confirmations[transactionId][msg.sender] = true;
         Confirmation(msg.sender, transactionId);
         if (isConfirmed(transactionId)) {
+            // Nevermind. FLAG: this gives a 1 of N owner veto power
+            // They also couldn't be removed because of this 
             setConfirmationTime(transactionId, block.timestamp);
         }
     }
@@ -94,7 +100,9 @@ contract MultiSigWalletWithTimeLock is MultiSigWallet {
         ownerExists(msg.sender)
         confirmed(transactionId, msg.sender)
         notExecuted(transactionId)
-        confirmationTimeNotSet(transactionId)
+        confirmationTimeNotSet(transactionId) // NOTE: this prevents revocation after a tx is 'fully approved'
+        // clearer would be:
+        // notConfirmed(transactionID) 
     {
         confirmations[transactionId][msg.sender] = false;
         Revocation(msg.sender, transactionId);

@@ -17,6 +17,7 @@
 */
 pragma solidity ^0.4.11;
 
+// NOTE: `MultiSigWalletWithTimeLock` is the owner of this contract according to 5_transfer_ownership deployment script
 import "./base/Token.sol";
 import "./base/Ownable.sol";
 
@@ -26,10 +27,13 @@ contract Proxy is Ownable {
 
     /// @dev Only authorized addresses can invoke functions with this modifier.
     modifier onlyAuthorized {
-        require(authorized[msg.sender]);
+        require(authorized[msg.sender]); // NOTE: require(false) is a REVERT (0xFD)
         _;
     }
 
+    // NOTE: onlyAuthorized could be replace with a call to targetAuthorized(msg.sender)
+    // it should then be renamed to something like `isAuthorized`
+    // the readability is probably justified though. 
     modifier targetAuthorized(address target) {
         require(authorized[target]);
         _;
@@ -72,7 +76,7 @@ contract Proxy is Ownable {
         targetAuthorized(target)
         returns (bool success)
     {
-        delete authorized[target];
+        delete authorized[target]; // NOTE: How do delete _really_ work in storage? 
         for (uint i = 0; i < authorities.length; i++) {
             if (authorities[i] == target) {
                 authorities[i] = authorities[authorities.length - 1];
@@ -98,7 +102,7 @@ contract Proxy is Ownable {
         onlyAuthorized
         returns (bool success)
     {
-        return Token(token).transferFrom(from, to, value);
+        return Token(token).transferFrom(from, to, value); // EXTERNAL CALL
     }
 
     /*

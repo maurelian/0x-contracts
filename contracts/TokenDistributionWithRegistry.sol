@@ -1,5 +1,10 @@
 pragma solidity ^0.4.11;
 
+// FLAG: WE HAVE NO IDEA HOW THIS IS BEING DEPLOYED/CONFIGURED
+// AdChain is a great example for readable deployment scripts
+// FLAG: where is the actual reference to registry? It doesn't look like they're actually using it 
+// despite the name of his file
+
 import "./Exchange.sol";
 import "./tokens/EtherToken.sol";
 import "./base/Token.sol";
@@ -27,7 +32,7 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
 
     event Finished();
 
-    address public PROXY_CONTRACT;
+    address public PROXY_CONTRACT; 
     address public EXCHANGE_CONTRACT;
     address public PROTOCOL_TOKEN_CONTRACT;
     address public ETH_TOKEN_CONTRACT;
@@ -39,11 +44,13 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
     mapping (address => bool) public registered;
     mapping (address => uint) public contributed;
 
-    bool public isInitialized;
+    bool public isInitialized; // could I change these? 
     bool public isFinished;
     uint public ethCapPerAddress;
     Order order;
 
+    // NOTE: in this case, the order has the additional v, r, s values. 
+    // FLAG: in this case, the orderHash is not the same as the getOrderHash() function? Actually, it's not specified here, this is just a struct
     struct Order {
         address maker;
         address taker;
@@ -60,7 +67,7 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         bytes32 r;
         bytes32 s;
         bytes32 orderHash;
-    }
+    } 
 
     modifier distributionInitialized() {
         assert(isInitialized);
@@ -95,66 +102,88 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         ETH_TOKEN_CONTRACT = _ethToken;
         ethCapPerAddress = _capPerAddress;
 
-        exchange = Exchange(_exchange);
+        // NOTE: store a reference to an Exchange, Token, and EtherToken contract... why?
+        exchange = Exchange(_exchange); 
         protocolToken = Token(_protocolToken);
         ethToken = EtherToken(_ethToken);
     }
 
     /// @dev Allows users to fill stored order by sending ETH to contract.
+    // NOTE: interestingly, this is doing exactly what that intern had suggested. Cool idea. 
+    // sybil risk?
+    // Any benefit to paying more than one purchase order at once? 
     function()
         payable
     {
         fillOrderWithEth();
     }
 
+
     /// @dev Stores order and initializes distribution.
+    // NOTE: what does this mean "initializes distribution?"
+    // This name is terrible. 
     /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
     /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
     /// @param v ECDSA signature parameter v.
     /// @param r CDSA signature parameters r.
     /// @param s CDSA signature parameters s.
-    function init(
+    function init( 
         address[5] orderAddresses,
         uint[6] orderValues,
         uint8 v,
         bytes32 r,
         bytes32 s)
-        distributionNotInitialized
+        distributionNotInitialized // NOTE: this ensures the fucntion can only be called once.
+        // So the whole thing is essentially one big maker order =()
         onlyOwner
     {
+        // FLAG: this pattern is repeated frequently... but it's basically using a native constructor already. 
+        // what is this one doing with the v,r,s? 
+        // FLAG: wait... so this sets the top level `order` variable
         order = Order({
-            maker: orderAddresses[0],
+            maker: orderAddresses[0], 
             taker: orderAddresses[1],
             makerToken: orderAddresses[2],
-            takerToken: orderAddresses[3],
-            feeRecipient: orderAddresses[4],
+            takerToken: orderAddresses[3], 
+            feeRecipient: orderAddresses[4], // FLAG: will there be a feeRecipient? Add a check to ensure no fees? 
             makerTokenAmount: orderValues[0],
             takerTokenAmount: orderValues[1],
             makerFee: orderValues[2],
-            takerFee: orderValues[3],
+            takerFee: orderValues[3], // if non-zero...
             expirationTimestampInSec: orderValues[4],
-            salt: orderValues[5],
-            v: v,
+            salt: orderValues[5], // FLAG: 
+            v: v, // FLAG: signature values. But not the ones associated with `orderHash`
             r: r,
             s: s,
             orderHash: getOrderHash(orderAddresses, orderValues)
+            // NOTE: consider using 
+            // exchange.getOrderHash(orderAddresses, orderValues);
+            // what would be the gas cost though? I suppose that requires another read to get the bytecode? 
+            // Interesting that DRY and gas efficiency are a trade off
+            // Consider adding to the best practices. 
         });
 
-        require(order.taker == address(this));
+        require(order.taker == address(this)); // this line ensures `this` contract is the taker
         require(order.makerToken == PROTOCOL_TOKEN_CONTRACT);
         require(order.takerToken == ETH_TOKEN_CONTRACT);
 
-        require(isValidSignature(
-            order.maker,
-            order.orderHash,
-            v,
-            r,
-            s
+        // so this works by requiring that the _maker_ submits the v,r,s values from signing the orderHash
+        // which they would do offline
+        // NOTE: This ensures the the signature values are from the same private key as the order.maker
+        //     who must submit the v,r,s which they obtain from signing sha3("\x19Ethereum Signed Message:\n32", order.orderHash)
+        require(isValidSignature( // this translates to: 
+            order.maker,          // return order.maker == ecrecover(
+            order.orderHash,      //     sha3("\x19Ethereum Signed Message:\n32", order.orderHash), 
+            v,                      // v,
+            r,                      // r, 
+            s                       // s 
         ));
 
         assert(setTokenAllowance(order.takerToken, order.takerTokenAmount));
         isInitialized = true;
 
+        // NOTE: This is pretty big. Should we suggest indexing some of it? Or is that handled by default?
+        // Whatever it only runs once. 
         Initialized(
             order.maker,
             order.taker,
@@ -180,28 +209,46 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         distributionNotFinished
         callerIsRegistered
     {
-        uint remainingEth = safeSub(order.takerTokenAmount, exchange.getUnavailableTakerTokenAmount(order.orderHash));
-        uint allowedEth = safeSub(ethCapPerAddress, contributed[msg.sender]);
+        // why is this all needed? Wouldn't the Exchange just handle it? 
+        uint remainingEth = safeSub(
+                                order.takerTokenAmount, //ie. the total ETH requested
+                                exchange.getUnavailableTakerTokenAmount(order.orderHash) // filled or cancelled
+                            ); // FLAG: EXTERNAL
+        uint allowedEth = safeSub(
+                            ethCapPerAddress, 
+                            contributed[msg.sender]
+                        );
         uint ethToFill = min256(min256(msg.value, remainingEth), allowedEth);
-        ethToken.deposit.value(ethToFill)();
+        // wrap the ETH in ETH_TOKEN_CONTRACT
+        ethToken.deposit.value(ethToFill)(); // FLAG: EXTERNAL
+        // FLAG: the ethToken wrapper will start empty... but the original allowance will be for the full amount
 
+        // FLAG: doing this before the exchange?  no that's probably safest
         contributed[msg.sender] = safeAdd(contributed[msg.sender], ethToFill);
 
+        /// @dev Fills an order with specified parameters and ECDSA signature, throws if specified amount not filled entirely.
         assert(exchange.fillOrKillOrder(
-            [order.maker, order.taker, order.makerToken, order.takerToken, order.feeRecipient],
+            [order.maker, 
+            order.taker, // why can't this just be msg.sender?
+            order.makerToken, order.takerToken, order.feeRecipient],
             [order.makerTokenAmount, order.takerTokenAmount, order.makerFee, order.takerFee, order.expirationTimestampInSec, order.salt],
-            ethToFill,
+            ethToFill, // FLAG: why fillOrKill? This includes redundant checks, since we've already determined that the amount is available
             order.v,
             order.r,
             order.s
         ));
+
+        // that's a lot of mul/div: (totalZRX / totalETH) * ethPaid
         uint filledProtocolToken = safeDiv(safeMul(order.makerTokenAmount, ethToFill), order.takerTokenAmount);
+        
+        // Send the token to the contributor
         assert(protocolToken.transfer(msg.sender, filledProtocolToken));
 
+        // return extra 
         if (ethToFill < msg.value) {
             assert(msg.sender.send(safeSub(msg.value, ethToFill)));
         }
-        if (remainingEth == ethToFill) {
+        if (remainingEth == ethToFill) {// FLAG: why not do just one more goddamn check?
             isFinished = true;
             Finished();
         }
@@ -215,11 +262,13 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         onlyOwner
         returns (bool success)
     {
-        assert(Token(_token).approve(PROXY_CONTRACT, _allowance));
+        // NOTE: this calls the ZRX token
+        assert(Token(_token).approve(PROXY_CONTRACT, _allowance)); // FLAG: external
         return true;
     }
 
     /// @dev Sets the cap per address to a new value.
+    // NOTE: this is for ALL addresses. 
     /// @param _newCapPerAddress New value of the cap per address.
     function setCapPerAddress(uint _newCapPerAddress)
         onlyOwner
@@ -251,10 +300,13 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
     /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
     /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
     /// @return Keccak-256 hash of order.
+    // FLAG: tests are ensuring that js implementation always matches
     function getOrderHash(address[5] orderAddresses, uint[6] orderValues)
         constant
         returns (bytes32 orderHash)
     {
+        // FLAG: why not call this on the Exchange contract itself? Prolly saves on gas. 
+        // FLAG: maybe consider using a lib?
         return sha3(
             EXCHANGE_CONTRACT,
             orderAddresses[0],
@@ -288,7 +340,8 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         returns (bool isValid)
     {
         return pubKey == ecrecover(
-            sha3("\x19Ethereum Signed Message:\n32", hash),
+            // NOTE: why is everything prefixed with this? 
+            sha3("\x19Ethereum Signed Message:\n32", hash), 
             v,
             r,
             s

@@ -16,7 +16,7 @@ export class OrderFactory {
     const orderParams: OrderParams = _.assign({}, {
       expirationTimestampInSec: randomExpiration,
       salt: this.generateSalt(),
-      taker: constants.NULL_ADDRESS,
+      taker: constants.NULL_ADDRESS, // sets taker to null address
     }, this.defaultOrderParams, customOrderParams);
     const order = new Order(orderParams);
     await order.signAsync();
