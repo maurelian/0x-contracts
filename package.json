@@ -7,11 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "transpile": "rm -rf ./transpiled; ./node_modules/.bin/copyfiles ./build/**/* ./transpiled; ./node_modules/.bin/tsc -p .",
+    "transpile": "rm -rf ./transpiled; copyfiles ./build/**/* ./transpiled; tsc",
     "test": "npm run transpile; ./node_modules/.bin/truffle test",
     "compile": "rm -rf build/contracts; ./node_modules/.bin/truffle compile",
     "migrate": "npm run transpile; ./node_modules/.bin/truffle migrate",
-    "deploy": "npm run transpile; ./node_modules/.bin/truffle migrate --network kovan"
+    "deploy": "npm run transpile; ./node_modules/.bin/truffle migrate --network kovan",
     "testrpc": "testrpc --networkId 50"
   },
   "repository": {
@@ -35,10 +35,11 @@
     "chai-typescript-typings": "^0.0.0",
     "copyfiles": "^1.2.0",
     "dirty-chai": "^2.0.0",
-    "solc": "^0.4.11",
     "ethereumjs-testrpc": "4.0.1",
-    "truffle": "3.4.3",
+    "solc": "^0.4.11",
     "solidity-coverage": "^0.1.7",
+    "truffle": "3.4.3",
+    "truffle-expect": "0.0.3",
     "typescript": "^2.2.2",
     "web3-typescript-typings": "0.0.3"
   },
