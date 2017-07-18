@@ -85,6 +85,9 @@ contract TokenRegistry is Ownable {
     /// @param _decimals Number of decimals, divisibility of new token.
     /// @param _ipfsHash IPFS hash of token icon.
     /// @param _swarmHash Swarm hash of token icon.
+    //MEDIUM: token addresses can be overwritten in the tokenByName and tokenBySymbol mappings
+    //      only needing to specify a new token address and same name/symbol
+    //      this can be worrisome if any external
     function addToken(
         address _token,
         string _name,
@@ -152,6 +155,8 @@ contract TokenRegistry is Ownable {
     /// @dev Allows owner to modify an existing token's name.
     /// @param _token Address of existing token.
     /// @param _name New name.
+    //MEDIUM: given the above note about addToken() this can erase traces of another token
+    //      not even entering the case where I will myself overwrite other tokens' names maliciously
     function setTokenName(address _token, string _name)
         public
         onlyOwner
@@ -167,6 +172,7 @@ contract TokenRegistry is Ownable {
     /// @dev Allows owner to modify an existing token's symbol.
     /// @param _token Address of existing token.
     /// @param _symbol New symbol.
+    //MEDIUM: v. setTokenName()
     function setTokenSymbol(address _token, string _symbol)
         public
         onlyOwner
