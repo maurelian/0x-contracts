@@ -19,6 +19,7 @@ contract Ownable {
         _;
     }
 
+    //NOTE: using the pattern where newOwner has to accept ownership feels safer, prevents mistakes like the zeroeth address and overall is a better practice
     function transferOwnership(address newOwner) onlyOwner {
         if (newOwner != address(0)) { // NOTE: why do people do this? Is it that easy to submit a 0 address?
             owner = newOwner;

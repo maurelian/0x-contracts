@@ -36,6 +36,8 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
     function executeRemoveAuthorizedAddress(uint transactionId)
         public
         notExecuted(transactionId)
+        //NOTE: confirmationTimeSet() modifier is being used for checking M out of N confirmations
+        //      Seems tricky!
         confirmationTimeSet(transactionId)
         validRemoveAuthorizedAddressTx(transactionId)
     {
@@ -57,6 +59,8 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
         constant
         returns (bool)
     {
+        //NOTE: This whole function wastes a lot of gas. [`bytes`tightly packed arrays cannot be cast to bytes4 as I originally thought!]
+        //      But in assembly this would be SO MUCH lean. I have working assembly code to do  just this!
         bytes4 removeAuthorizedAddressSignature = bytes4(sha3("removeAuthorizedAddress(address)"));
         // FLAG: why not just use `data == removeAuthorizedAddressSignature`
         for (uint i = 0; i < 4; i++) {

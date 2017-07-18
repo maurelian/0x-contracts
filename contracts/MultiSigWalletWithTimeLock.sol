@@ -70,6 +70,8 @@ contract MultiSigWalletWithTimeLock is MultiSigWallet {
     function changeTimeLock(uint _secondsTimeLocked)
         public
         onlyWallet
+        //NOTE: this makes the pattern not-trustless at all.
+        //      Consider having this taking effect at least after waiting the current secondsTimeLocked
     {
         secondsTimeLocked = _secondsTimeLocked;
         TimeLockChange(_secondsTimeLocked);
@@ -113,6 +115,7 @@ contract MultiSigWalletWithTimeLock is MultiSigWallet {
     function executeTransaction(uint transactionId)
         public
         notExecuted(transactionId)
+        //NOTE: is this really needed? (confirmationTimeSet() modifier does not make much sense altogether)
         confirmationTimeSet(transactionId)
         pastTimeLock(transactionId)
     {
