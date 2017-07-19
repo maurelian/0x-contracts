@@ -21,7 +21,7 @@ module.exports = (deployer: any) => {
   })
   // NOTE: here is where the ZRX token's symbol is set, and the Exchange is deployed
   .then((ptAddress: string) => {
-     // ptAddress = "protocol token"
+     // NOTE: ptAddress = "protocol token"
     return deployer.deploy(Exchange, ptAddress, proxy.address);
   }).then(() => {
     return proxy.addAuthorizedAddress(Exchange.address);
