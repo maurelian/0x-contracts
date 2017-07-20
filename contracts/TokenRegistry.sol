@@ -193,7 +193,7 @@ contract TokenRegistry is Ownable {
         onlyOwner
         tokenExists(_token)
     {
-         token = tokens[_token];
+        TokenMetadata token = tokens[_token]; // FLAG: undeclared
         LogTokenIpfsHashChange(_token, token.ipfsHash, _ipfsHash);
         token.ipfsHash = _ipfsHash;
     }
