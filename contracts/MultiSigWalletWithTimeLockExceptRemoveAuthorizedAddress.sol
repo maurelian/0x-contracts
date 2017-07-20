@@ -11,7 +11,9 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
     modifier validRemoveAuthorizedAddressTx(uint transactionId) {
         Transaction tx = transactions[transactionId];
         assert(tx.destination == PROXY_CONTRACT);
-        assert(isFunctionRemoveAuthorizedAddress(tx.data));
+        //NOTE: why assert here if the function (below) itself already asserts during its execution?
+        //assert(isFunctionRemoveAuthorizedAddress(tx.data));
+        assert(bytes4FromBytes(tx.data) == bytes4(sha3("removeAuthorizedAddress(address)")));
         _;
     }
 
@@ -51,21 +53,38 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
         }
     }
 
+    function bytes4FromBytes(bytes data)
+        public
+        constant
+        returns (bytes4)
+    {
+        require(data.length >= 4);
+        
+        bytes4 first4Bytes;
+        
+        assembly {
+            first4Bytes := mul(div(mload(add(data, 0x20)), 0x100000000000000000000000000000000000000000000000000000000), 0x100000000000000000000000000000000000000000000000000000000)
+        }
+        
+        return first4Bytes;
+    }
+
     /// @dev Compares first 4 bytes of byte array to removeAuthorizedAddress function signature.
     /// @param data Transaction data.
     /// @return Successful if data is a call to removeAuthorizedAddress.
-    function isFunctionRemoveAuthorizedAddress(bytes data)
-        public
-        constant
-        returns (bool)
-    {
-        //NOTE: This whole function wastes a lot of gas. [`bytes`tightly packed arrays cannot be cast to bytes4 as I originally thought!]
-        //      But in assembly this would be SO MUCH lean. I have working assembly code to do  just this!
-        bytes4 removeAuthorizedAddressSignature = bytes4(sha3("removeAuthorizedAddress(address)"));
-        // FLAG: why not just use `data == removeAuthorizedAddressSignature`
-        for (uint i = 0; i < 4; i++) {
-            assert(data[i] == removeAuthorizedAddressSignature[i]);
-        }
-        return true;
-    }
+    // function isFunctionRemoveAuthorizedAddress(bytes data)
+    //     public
+    //     constant
+    //     returns (bool)
+    // {
+    //     //NOTE: This whole function wastes a lot of gas. [`bytes`tightly packed arrays cannot be cast to bytes4 as I originally thought!]
+    //     //      But in assembly this would be SO MUCH lean. I have working assembly code to do  just this!
+    //     bytes4 removeAuthorizedAddressSignature = bytes4(sha3("removeAuthorizedAddress(address)"));
+    //     for (uint i = 0; i < 4; i++) {
+    //         assert(data[i] == removeAuthorizedAddressSignature[i]);
+    //     }
+    //     return true;
+    // }
+
+
 }

@@ -77,7 +77,8 @@ contract Proxy is Ownable {
         targetAuthorized(target)
         returns (bool success)
     {
-        delete authorized[target]; // NOTE: How do delete _really_ work in storage? 
+        delete authorized[target];
+        //NOTE: remove algorithm scrambles the chronological order
         for (uint i = 0; i < authorities.length; i++) {
             if (authorities[i] == target) {
                 authorities[i] = authorities[authorities.length - 1];
@@ -103,7 +104,10 @@ contract Proxy is Ownable {
         onlyAuthorized
         returns (bool success)
     {
-        return Token(token).transferFrom(from, to, value); // EXTERNAL CALL
+        //NOTE: This makes the owners have to be really careful with future exchange designs. ALWAYS CHECK FOR REENTRANCY BUGS.
+        //      Optimaly don't have a function called `transferFrom()` in Exchange(.sol)-like contracts and make sure it doesn't
+        //      implement a fallback function as well.
+        return Token(token).transferFrom(from, to, value);
     }
 
     /*
