@@ -45,6 +45,8 @@ contract Exchange is SafeMath {
     mapping (bytes32 => uint) public filled;
     mapping (bytes32 => uint) public cancelled;
 
+    // should there be a version string
+
     event LogFill(
         address indexed maker,
         address taker,
@@ -187,7 +189,7 @@ contract Exchange is SafeMath {
             LogError(ERROR_INSUFFICIENT_BALANCE_OR_ALLOWANCE, order.orderHash);
             return 0;
         }
-
+        // NOTE: all functions should be explicitly labelled internal or public...
         uint filledMakerTokenAmount = getPartialAmount(filledTakerTokenAmount, order.takerTokenAmount, order.makerTokenAmount);
         uint paidMakerFee;
         uint paidTakerFee;

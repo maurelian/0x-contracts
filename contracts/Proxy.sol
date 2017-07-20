@@ -58,6 +58,7 @@ contract Proxy is Ownable {
     /// @param target Address to authorize.
     /// @return Success of authorization.
     function addAuthorizedAddress(address target)
+        public // <- add
         onlyOwner
         targetNotAuthorized(target)
         returns (bool success)

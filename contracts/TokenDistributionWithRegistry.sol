@@ -226,7 +226,8 @@ contract TokenDistributionWithRegistry is Ownable, SafeMath {
         // FLAG: doing this before the exchange?  no that's probably safest
         contributed[msg.sender] = safeAdd(contributed[msg.sender], ethToFill);
 
-        /// @dev Fills an order with specified parameters and ECDSA signature, throws if specified amount not filled entirely.
+        // NOTE: this @dev tag causes an error in solc
+        // Fills an order with specified parameters and ECDSA signature, throws if specified amount not filled entirely.
         assert(exchange.fillOrKillOrder(
             [order.maker, 
             order.taker, // why can't this just be msg.sender?
