@@ -105,6 +105,8 @@ The following Issues on Github that have been fixed:
 * https://github.com/0xProject/contracts/issues/91
 * https://github.com/0xProject/contracts/issues/80
 
+* There is a lack of documentation, with many interactions and components of th system not covered at all in the white paper.  For example, see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
+
 
 ## 3.1 Critical
 
