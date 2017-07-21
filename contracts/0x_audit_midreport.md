@@ -134,7 +134,16 @@ In Exchange.sol, `require` that tokens are registered in TokenRegistry.sol.  In 
 
 ## 3.3 Medium  
 
-### 3.3.1 Makers "griefing" takers
+### 3.3.1 `confirmationTimeSet` modifiers
+
+In both MultiSigWalletWithTimeLock.sol and MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol, a transaction has a confirmation time if and only if it is confirmed by the required number of owners. The `confirmationTimeNotSet` and `confirmationTimeSet` modifiers are named according to their design, rather than their purpose, which is to guard against calls to `confirmTransaction()`, and `revokeConfirmation()`.
+
+#### Recommendations
+
+The `isConfirmed()` function could be reused to create a pair of modifiers more accurately named `checkConfirmed()` and `checkNotConfirmed()`. These names would be more explicit and thus readable for future reviewers.
+
+
+### 3.3.2 Makers "griefing" takers
 
 "Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas.  For example: a taker is "griefed" by a maker who's order is no longer valid since the maker tokens no longer exist. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
 
