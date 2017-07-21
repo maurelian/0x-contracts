@@ -5,6 +5,8 @@
 * "Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
 * Is checking againt `address(0)` useful? I don't think so. There are an almost infinite number of ways to throw tokens into a blackhole, no reason to spend computation power on this one in particular.
 
+* Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the Proxy.sol calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
+
 
 ## Contracts
 
