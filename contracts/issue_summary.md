@@ -26,6 +26,8 @@
 * Despite the file name, there is no reference to the registry contract at all.
 * There is no `require` statement to ensure there are no fees, and no `feeRecipient` on the order. This seems unlikely, but does require extra verification of the published code, or simple trust that no fee has been specified. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
 
+* We note that the contract is using up 3 storage slots which could be avoided: https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37  This is effectively a one-time cost instead of a recurring cost, so no dangers related to increasing costs.
+
 ### TokenRegistry.sol
 
 
