@@ -99,15 +99,22 @@ The following Issues on Github:
 * https://github.com/0xProject/contracts/issues/93
 * https://github.com/0xProject/contracts/issues/77
 
-The following Issues on Github that have been fixed:
+The following Issues on Github that have been closed:
 * https://github.com/0xProject/contracts/issues/88
 * https://github.com/0xProject/contracts/issues/84
-* https://github.com/0xProject/contracts/issues/91
 * https://github.com/0xProject/contracts/issues/80
 
 * There is a lack of documentation, with many interactions and components of th system not covered at all in the white paper.  For example, see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
 
+* https://github.com/0xProject/contracts/issues/91 There is no `require` statement to ensure there are no fees, and no `feeRecipient` on the order. This seems unlikely, but does require extra verification of the published code, or simple trust that no fee has been specified. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
+
+
+Other:
+
 * The `makerFee` value is a uint, making it impossible to give negative fees, which is sometimes useful for incentivizing liquidity.
+
+* We note that the contract is using up 3 storage slots which could be avoided: https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37  This is effectively a one-time cost instead of a recurring cost, so no dangers related to increasing costs.
+
 
 ## 3.1 Critical
 
