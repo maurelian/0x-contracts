@@ -32,8 +32,8 @@
 
 # 2 - Introduction
 
-From <start date [month + day]> through <finish date [month + day]> of 2017, ConsenSys Diligence conducted an security
-audit of the 0xProject's contract system. The findings of this audit are presented here in this document.
+From June 28 through July 21 of 2017, ConsenSys Diligence conducted an initial phase of a security
+audit of the 0xProject's contract system. The findings of this preliminary audit are presented here in this document.
 
 ## 2.1 Audit Goals
 
@@ -71,28 +71,25 @@ The state of the source code at the time of the audit can be found under the com
 
 The following documentation was available to the review team:
 
-* The [<whitepaper name & release date>](<link to respective whitepaper version>)
-* The [README](https://github.com/uport-project/uport-proxy/blob/5979d3f121b5b89e58d6712d442f36750d8e37fd/README.md) file for the <project repo name> repository
-* <Presentations slides and diagrams>
-* <Functional Specification>
+* The [0x Project Whitepaper](https://0xproject.com/pdfs/0x_white_paper.pdf)
+* The [README](https://github.com/0xProject/contracts/blob/master/README.md) file for the [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository.
 
 ## 2.4 Dynamic Testing
 
 ### Pre-existing tests
 
-The pre-existing tests for https://github.com/uport-project/uport-proxy/ were executed using the truffle framework, run against contracts deployed on a local instance of testrpc.  There were no pre-existing tests available for https://github.com/uport-project/uport-registry/.
+The pre-existing tests for [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository were executed using the truffle framework, run against contracts deployed on a local instance of testrpc.
 
-Test results of the pre-existing test battery are available in Appendix 5.
+In order for the tests to succeed, the module `ethereumjs-testrpc` had to be uninstalled and reinstalled specifying version `3.0.2`.
 
-### Additional testing //OPTIONAL
-
-<possible additions to the test suite go here>
-
-
+```
+$ npm uninstall -g ethereumjs-testrpc
+$ npm install -g ethereumjs-testrpc@3.0.2
+```
 
 # 3 - General Findings
 
-This section discusses general issues that apply to the contract (and test) code base. These issues are primarily related to architecture, security assumptions and other high level design decisions, and are essential to a thorough security review. Realizing that these decisions are made as part of a set of trade offs, the <project name> team may decide not to take action on all of our findings. They should however clarify the rationale for such decisions.
+This section discusses general issues that apply to the contract (and test) code base. These issues are primarily related to architecture, security assumptions and other high level design decisions, and are essential to a thorough security review. Realizing that these decisions are made as part of a set of trade offs, the 0xProject team may decide not to take action on all of our findings. They should however clarify the rationale for such decisions.
 
 ## 3.1 Critical
 
@@ -442,20 +439,4 @@ b3e362b53609f0b6efc4f00e5215d85e8e50db924752988704023ecf220af3f7  base/Ownable.s
 165fc791ffe0ec3faa8e0eb3b1dc995650cfdf4d3c19bf5a6f0691c7a6540ea9  base/StandardToken.sol
 c59b967d6f5c2f3f3b66ffe5a4ed26812cb57aea13f1b9ba087f44bcd79a31f0  base/StandardTokenWithOverflowProtection.sol
 b3c224de95d004db90477fc9034c4e68afcc4679c93dfa9da3003bd44e0fe471  base/Token.sol
-```
-
-
-# Appendix 5 - Test Battery Results
-
-In order for the tests to succeed, the module `ethereumjs-testrpc` had to be uninstalled and reinstalled specifying version `3.0.2`.
-
-```
-$ npm uninstall -g ethereumjs-testrpc
-$ npm install -g ethereumjs-testrpc@3.0.2
-```
-
-Results from the pre-existing test battery are provided here for reference.
-
-```
-
 ```
