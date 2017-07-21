@@ -48,7 +48,7 @@
 
 ### tokens/ZRXToken.sol
 
-* Constructor is misnamed as `ProtocolToken()`
+* Constructor is misnamed as `ProtocolToken()`. https://github.com/0xProject/contracts/issues/88 was fixed, but the fix didn't include a test.
 
 
 ## /// Items we'll likely remove before sending
