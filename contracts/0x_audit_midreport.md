@@ -63,9 +63,9 @@ areas of focus include:
 ## 2.2 Source Code
 
 
-The code being audited was from the [<repository name>](<repository link>).
+The code being audited was from the [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository.
 
-The state of the source code at the time of the audit can be found under the commit hash `<commit hash>`.
+The state of the source code at the time of the audit can be found under the commit hash `888d5a02573572240f4c55e03238be603c13c469`.
 
 ## 2.3 Documentation
 
