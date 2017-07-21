@@ -8,8 +8,6 @@
 
 ## Contracts
 
-### Proxy.sol
-
 
 ### Exchange.sol
 
@@ -31,9 +29,13 @@
 ### MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
 
 
+### tokens/ZRXToken.sol
+
+* Constructor is misnamed as `ProtocolToken()`
 
 
+## /// Items we'll likely remove before sending
 
-### SafeMath
+### SafeMath 
 
 * I had a comment about untested functions, and safeDiv being unnecessary, but I don't think either really needs to be included.
