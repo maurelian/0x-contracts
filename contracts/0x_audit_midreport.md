@@ -100,7 +100,7 @@ The following Issues on Github:
 * https://github.com/0xProject/contracts/issues/77
 
 The following Issues on Github that have been closed:
-* https://github.com/0xProject/contracts/issues/88
+* https://github.com/0xProject/contracts/issues/88 but the fix didn't include a test.
 * https://github.com/0xProject/contracts/issues/84
 * https://github.com/0xProject/contracts/issues/80
 
