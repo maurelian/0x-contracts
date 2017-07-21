@@ -119,14 +119,13 @@ Provide tools, scripts, libraries to make it easy for people to identify orders 
 
 ## 3.4 Minor  
 
-### 3.4.1 <issue title>
+### 3.4.1 Versioning of Exchange contract
 
-<issue long description>
+It's not clear how an upgraded exchange contract will differentiate from this contract.
 
 #### Recommendations
 
-<recommendation to solve the issue>
-
+A version string in Exchange.sol may be useful.
 
 # 4 Detailed Solidity Review Findings
 
