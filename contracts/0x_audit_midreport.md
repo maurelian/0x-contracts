@@ -32,7 +32,7 @@
 
 # 2 - Introduction
 
-From June 28 through July 21 of 2017, ConsenSys Diligence conducted an initial phase of a security
+From July 3 through July 21 of 2017, ConsenSys Diligence conducted an initial phase of a security
 audit of the 0xProject's contract system. The findings of this preliminary audit are presented here in this document.
 
 ## 2.1 Audit Goals
