@@ -109,13 +109,13 @@ In Exchange.sol, `require` that tokens are registered in TokenRegistry.sol.  In 
 
 ## 3.3 Medium  
 
-### 3.3.1 <issue title>
+### 3.3.1 Makers "griefing" takers
 
-<issue long description>
+"Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas.  For example: a taker is "griefed" by a maker who's order is no longer valid since the maker tokens no longer exist. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
 
 #### Recommendations
 
-<recommendation to solve the issue>
+Provide tools, scripts, libraries to make it easy for people to identify orders which are no longer valid.
 
 ## 3.4 Minor  
 
