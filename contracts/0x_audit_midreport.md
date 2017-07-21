@@ -127,6 +127,7 @@ No bugs or security vulnerabilities were found to be directly exploitable, and t
 
 <recommendation to solve the issue>
 
+
 # 4 Detailed Solidity Review Findings
 
 ## 4.1 <contract file name>
@@ -147,7 +148,7 @@ Severity: **<issue severity>**
 
 # 5 Test Coverage Analysis
 
-Testing is implemented using the <framework name>.
+Testing is implemented using the Truffle Framework.
 
 Automated measurement was done using [SolCover](https://github.com/JoinColony/solcover).
 
@@ -249,20 +250,30 @@ Left unaddressed these issues are highly likely or guaranteed to cause major
 problems or potentially a full failure in the operations of the contract.
 
 
-//# Appendix 3 - Framework Components and Concepts
-// don't think this is needed
-
-
 # Appendix 4 - Audit Details
 
 ## A.4.1 File List
 
 The following source files were included in the audit.
 
-<link to repo including frozen commit ref>
+https://github.com/0xProject/contracts/commit/888d5a02573572240f4c55e03238be603c13c469
 
-* <file name>
-* <file name 2>
+* Exchange.sol
+* MultiSigWalletWithTimeLock.sol
+* MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
+* Proxy.sol
+* TokenDistributionWithRegistry.sol
+* TokenRegistry.sol
+* base/MultiSigWallet.sol
+* base/Ownable.sol
+* base/SafeMath.sol
+* base/StandardToken.sol
+* base/StandardTokenWithOverflowProtection.sol
+* base/Token.sol
+* tokens/DummyToken.sol
+* tokens/EtherToken.sol
+* tokens/Mintable.sol
+* tokens/ZRXToken.sol
 
 <notes about possibly obsolete or completely unneeded files go here>
 
@@ -273,7 +284,7 @@ The following source files were included in the audit.
 The number of files present in the project is:
 
 ```
-<output of the command below>
+21
 ```
 
 NIX command used for the statistic:
@@ -287,7 +298,28 @@ find . -name '*.sol' | wc -l
 The number of LOC present in the project is:
 
 ```
-<output of the command below>
+     365 ./contracts/base/MultiSigWallet.sol
+      27 ./contracts/base/Ownable.sol
+      41 ./contracts/base/SafeMath.sol
+      44 ./contracts/base/StandardToken.sol
+      89 ./contracts/base/StandardTokenWithOverflowProtection.sol
+      38 ./contracts/base/Token.sol
+     588 ./contracts/Exchange.sol
+      23 ./contracts/Migrations.sol
+     132 ./contracts/MultiSigWalletWithTimeLock.sol
+      64 ./contracts/MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
+     116 ./contracts/Proxy.sol
+     297 ./contracts/TokenDistributionWithRegistry.sol
+     309 ./contracts/TokenRegistry.sol
+      33 ./contracts/tokens/DummyToken.sol
+      47 ./contracts/tokens/EtherToken.sol
+      16 ./contracts/tokens/Mintable.sol
+      15 ./contracts/tokens/ZRXToken.sol
+    1676 ./node_modules/truffle/build/Assert.sol
+      13 ./node_modules/truffle/build/SafeSend.sol
+       7 ./node_modules/truffle/build/templates/Example.sol
+      13 ./node_modules/truffle/build/templates/Test.sol
+    3953 total
 ```
 
 NIX command used for the statistic:
@@ -298,43 +330,64 @@ find . -name '*.sol' | xargs wc -l
 
 ### A.4.2.3 ABI Inspection
 
-How many functions are there in the project?
+How many functions are there in the project? (please see _Notes_ below)
 
 ```
-<output of the command below>
+202
 ```
 
 How many state-changing functions are there in the project?
 
 ```
-<output of the command below>
+85
 ```
 
 NIX command used for the statistic:
 
 ```
 # output the ABI to a file using solc
-$ solc —abi contracts/*.sol > abi.json
+$ solc --abi contracts/*.sol > abi.json
+$ solc --abi contracts/base/*.sol > abi_base.json
 
 # how many functions are there? 
-$  cat abis.json | grep -o \"type\":\"function\" | wc -l
+$ cat abi.json | grep -o \"type\":\"function\" | wc -l
+$ cat abi_base.json | grep -o \"type\":\"function\" | wc -l
 
 # how many functions are state changing?
-$ cat abis.json | grep -o \"constant\":false | wc -l
+$ cat abi.json | grep -o \"constant\":false | wc -l
+$ cat abi_base.json | grep -o \"constant\":false | wc -l
 ```
+
+_Note:_ the `tokens` folder could not be inspected because the compiler was not able to process the `import` statements correctly.
 
 ### A.4.2.3 External Call Count
 
 How many external calls are there in the project?
 
 ```
-<output of the command below>
+contracts/Exchange.sol:521:        						return Proxy(PROXY_CONTRACT).transferFrom(token, from, to, value);
+contracts/Exchange.sol:574:        						return Token(token).balanceOf(owner);
+contracts/Exchange.sol:586:        						return Token(token).allowance(owner, PROXY_CONTRACT);
+contracts/Migrations.sol:21:        					upgraded.setCompleted(last_completed_migration);
+contracts/MultiSigWalletWithTimeLock.sol:113:        	if (tx.destination.call.value(tx.value)(tx.data))
+contracts/MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol:42:        if (tx.destination.call.value(tx.value)(tx.data))
+contracts/Proxy.sol:62:        							authorities.push(target);
+contracts/Proxy.sol:101:        						return Token(token).transferFrom(from, to, value);
+contracts/TokenDistributionWithRegistry.sol:183:        uint remainingEth = safeSub(order.takerTokenAmount, exchange.getUnavailableTakerTokenAmount(order.orderHash));
+contracts/TokenDistributionWithRegistry.sol:186:        ethToken.deposit.value(ethToFill)();
+contracts/TokenDistributionWithRegistry.sol:199:        assert(protocolToken.transfer(msg.sender, filledProtocolToken));
+contracts/TokenDistributionWithRegistry.sol:202:        assert(msg.sender.send(safeSub(msg.value, ethToFill)));
+contracts/TokenDistributionWithRegistry.sol:218:        assert(Token(_token).approve(PROXY_CONTRACT, _allowance));
+contracts/TokenRegistry.sol:109:        				tokenAddresses.push(_token);
+contracts/base/MultiSigWallet.sol:127:        			owners.push(owner);
+contracts/base/MultiSigWallet.sol:228:            		if (tx.destination.call.value(tx.value)(tx.data))
+contracts/tokens/EtherToken.sol:45:        				assert(msg.sender.send(amount));
 ```
 
 NIX command used for the statistic:
 
 ```
-egrep '\.\w*\(.*\)' contracts/* --colour=auto -nr
+egrep '\.\w*\(.*\)' contracts/* -nr
 ```
 
 ## A.4.3 File Signatures
@@ -345,20 +398,41 @@ The SHA256 hash of each files at the time of the audit was as follows.
 
 ```
 $ shasum -a 256 *
-<sha256 hash> <file name>
+3735bf38919eee108050160416df761c7daeaf51f599ef66711ea8dc870a83df  Exchange.sol
+c6ab0ec0aa9228fd1860a459a4ce5182ff3f5bfb067bffed6790bf5490ee259f  Migrations.sol
+21760701907a858e824aa426a970bbac0b1f0ebc92323450ba68788db9cb2c31  MultiSigWalletWithTimeLock.sol
+9770531fc2cefd7eb4b4beb2aa7cb0e30eacedfb86d52b54123599fc66be7606  MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
+c803f22bf706761bd2c6e5e2a748994af0c475a6a26a18d395b918e0101fe237  Proxy.sol
+9851e89ecafee0977cf1aca0bac6ab26f190461a7ac31cea7ee0382651c90fb5  TokenDistributionWithRegistry.sol
+e2396ce460d77b1bfbb0564d8de30ea64e33f67a2ba0346ba4b46de9acb338c8  TokenRegistry.sol
+
+$ shasum -a 256 tokens/*
+7f8ecf84856c8d7a19cecc46dfd83c4caa9a69fe6cad76cf1b92653a74314b52  tokens/DummyToken.sol
+45562f8dc0803d71d54e3d425092f206114563e6da4e14fda2ba3fadde86b594  tokens/EtherToken.sol
+26c2377b293b30f9e21716d00b663141af5af47e67f06c5c8a33ac40f6ecd878  tokens/Mintable.sol
+8d27f242c7797d0fa4b47cf924346c3f21c86d68728826cab7965be8b37de85f  tokens/ZRXToken.sol
+
+$ shasum -a 256 base/*
+9a34b67d72394a5ce5f1c67839df8e5cbf499ae61396a455293123cb010977d1  base/MultiSigWallet.sol
+b3e362b53609f0b6efc4f00e5215d85e8e50db924752988704023ecf220af3f7  base/Ownable.sol
+4f162f2481ce69be378ff44777be363aca50e96159c1fa84ff786974ceb34966  base/SafeMath.sol
+165fc791ffe0ec3faa8e0eb3b1dc995650cfdf4d3c19bf5a6f0691c7a6540ea9  base/StandardToken.sol
+c59b967d6f5c2f3f3b66ffe5a4ed26812cb57aea13f1b9ba087f44bcd79a31f0  base/StandardTokenWithOverflowProtection.sol
+b3c224de95d004db90477fc9034c4e68afcc4679c93dfa9da3003bd44e0fe471  base/Token.sol
 ```
 
 
 # Appendix 5 - Test Battery Results
 
-In order for the tests to succeed, <explain possible steps needed to make tests run>.
+In order for the tests to succeed, the module `ethereumjs-testrpc` had to be uninstalled and reinstalled specifying version `3.0.2`.
 
 ```
-<paste commands to run in terminal for above to be possible>
+$ npm uninstall -g ethereumjs-testrpc
+$ npm install -g ethereumjs-testrpc@3.0.2
 ```
 
 Results from the pre-existing test battery are provided here for reference.
 
 ```
-<paste terminal output here>
+
 ```
