@@ -18,15 +18,20 @@
 * the exchange does not reference the registry at all
 * without a registry to 'whitelist' approved coins, there is a risk of exploits by a malicious token
 * the `makerFee` and `takerFee` fields are not included in the white paper for point to point orders. It's not clear if this is intentional.
-*
+* The `makerFee` value is a uint, making it impossible to give negative fees, which is sometimes useful for incentivizing liquidity.
 
 ### TokenDistributionWithRegistry.sol
 
 * The frozen branch had no migrations for this contract. They seem to have been added to the master branch however.
 * Despite the file name, there is no reference to the registry contract at all.
-
+* There is no `require` statement to ensure there are no fees, and no `feeRecipient` on the order. This seems unlikely, but does require extra verification of the published code, or simple trust that no fee has been specified. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
 
 ### TokenRegistry.sol
+
+
+
+
+
 
 
 
