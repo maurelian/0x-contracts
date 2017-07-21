@@ -55,10 +55,3 @@ The TokenRegistry.sol may alleviate risks from malicious tokens, but Exchange.so
 ### tokens/ZRXToken.sol
 
 * Constructor is misnamed as `ProtocolToken()`. https://github.com/0xProject/contracts/issues/88 was fixed, but the fix didn't include a test.
-
-
-## /// Items we'll likely remove before sending
-
-### SafeMath
-
-* I had a comment about untested functions, and safeDiv being unnecessary, but I don't think either really needs to be included.
