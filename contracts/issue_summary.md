@@ -7,6 +7,8 @@
 
 * Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the Proxy.sol calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
 
+The TokenRegistry.sol may alleviate risks from malicious tokens, but Exchange.sol does not reference it at all.  A possible way to alleviate risks from unknown or malicious tokens, is to require that an exchange only use "whitelisted" tokens by a token registry.
+
 
 ## Contracts
 
