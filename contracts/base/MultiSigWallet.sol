@@ -16,6 +16,7 @@ contract MultiSigWallet {
     event OwnerRemoval(address indexed owner);
     event RequirementChange(uint required);
 
+    // NOTE: why is this a mapping rather than an array? Does it have some benefit wrt to storage?
     mapping (uint => Transaction) public transactions;
     mapping (uint => mapping (address => bool)) public confirmations;
     mapping (address => bool) public isOwner;
@@ -225,7 +226,7 @@ contract MultiSigWallet {
         if (isConfirmed(transactionId)) {
             Transaction tx = transactions[transactionId];
             tx.executed = true;
-            if (tx.destination.call.value(tx.value)(tx.data))
+            if (tx.destination.call.value(tx.value)(tx.data)) // FLAG: External
                 Execution(transactionId);
             else {
                 ExecutionFailure(transactionId);

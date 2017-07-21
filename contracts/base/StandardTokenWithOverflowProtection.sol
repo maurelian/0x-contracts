@@ -3,6 +3,8 @@ pragma solidity ^0.4.8;
 import "./Token.sol";
 import "./SafeMath.sol";
 
+// FLAG: the name of this contract is confusing, because StandardToken also has overflow protection
+
 /// @title Standard token contract with overflow protection - Used for tokens with dynamic supply.
 contract StandardTokenWithOverflowProtection is Token,
                                                 SafeMath

@@ -109,7 +109,7 @@ contract TokenRegistry is Ownable {
             ipfsHash: _ipfsHash,
             swarmHash: _swarmHash
         });
-        tokenAddresses.push(_token);
+        tokenAddresses.push(_token); 
         tokenBySymbol[_symbol] = _token;
         tokenByName[_name] = _token;
         LogAddToken(
@@ -193,7 +193,7 @@ contract TokenRegistry is Ownable {
         onlyOwner
         tokenExists(_token)
     {
-        TokenMetadata token = tokens[_token];
+        TokenMetadata token = tokens[_token]; // FLAG: undeclared
         LogTokenIpfsHashChange(_token, token.ipfsHash, _ipfsHash);
         token.ipfsHash = _ipfsHash;
     }

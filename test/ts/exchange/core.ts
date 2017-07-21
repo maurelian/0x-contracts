@@ -58,6 +58,7 @@ contract('Exchange', (accounts: string[]) => {
     const defaultOrderParams = {
       exchangeContractAddress: Exchange.address,
       maker,
+      // note, this default order has no taker
       feeRecipient,
       makerToken: repAddress,
       takerToken: dgdAddress,
@@ -66,6 +67,7 @@ contract('Exchange', (accounts: string[]) => {
       makerFee: toSmallestUnits(1),
       takerFee: toSmallestUnits(1),
     };
+    // NOTE: OrderFactory is defined in util/order_factory.ts
     orderFactory = new OrderFactory(defaultOrderParams);
 
     [rep, dgd, zrx] = await Promise.all([
@@ -91,6 +93,8 @@ contract('Exchange', (accounts: string[]) => {
   });
 
   describe('internal functions', () => {
+    /* FLAG: Why are these testing to ensure that the exchange functions are 'undefined'?
+    Seems like incomplete tests or somthing. */
     it('should include transferViaProxy', () => {
       assert.equal(exchange.transferViaProxy, undefined);
     });
@@ -224,7 +228,7 @@ contract('Exchange', (accounts: string[]) => {
 
     it('should transfer the correct amounts when taker is specified and order is claimed by taker', async () => {
       order = await orderFactory.newSignedOrderAsync({
-        taker,
+        taker,  // NOTE: accounts[1]
         makerTokenAmount: toSmallestUnits(100),
         takerTokenAmount: toSmallestUnits(200),
       });
@@ -624,7 +628,7 @@ contract('Exchange', (accounts: string[]) => {
     });
 
     it('should not log events if no value is cancelled', async () => {
-      await exWrapper.cancelOrderAsync(order, maker);
+      await exWrapper.cancelOrderAsync(order, maker); // FLAG: why is this done twice? 
 
       const res = await exWrapper.cancelOrderAsync(order, maker);
       assert.equal(res.logs.length, 1);

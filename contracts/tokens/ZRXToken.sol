@@ -7,7 +7,7 @@ contract ZRXToken is StandardToken {
     string constant public name = "0x Network Token";
     string constant public symbol = "ZRX";
 
-    function ProtocolToken() {
+    function ProtocolToken() { // FLAG: misnamed constructor?
         totalSupply = 10**26; // 100M tokens, 18 decimal places
         balances[msg.sender] = totalSupply;
     }

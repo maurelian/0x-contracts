@@ -92,7 +92,8 @@ export class Order {
     };
     return cancel;
   }
-  private getOrderHash() {
+  // NOTE: this is not running the constant call to the contract
+  private getOrderHash() { 
     const orderHash = crypto.solSHA3([
       this.params.exchangeContractAddress,
       this.params.maker,

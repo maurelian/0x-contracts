@@ -36,8 +36,16 @@ contract Exchange is SafeMath {
     address public PROXY_CONTRACT;
 
     // Mappings of orderHash => amounts of takerTokenAmount filled or cancelled.
+    /* 
+        OK: FLAG: is this sufficient for replay protection? 
+        what is the order is not completely filled? 
+        Is replaying the fill a possible attack against the maker? 
+        IDEA: full replay attack protection. 
+     */
     mapping (bytes32 => uint) public filled;
     mapping (bytes32 => uint) public cancelled;
+
+    // should there be a version string
 
     event LogFill(
         address indexed maker,
@@ -66,6 +74,15 @@ contract Exchange is SafeMath {
 
     event LogError(uint8 indexed errorId, bytes32 indexed orderHash);
 
+    /* 
+        NOTE: This is an important struct. It has the basic structure which is seen repeated in 
+        function calls of {address[5], uint[5], bytes32}
+        Q: However, it's expressed in the function declarations as {address[5], uint[6]}, is there 
+        any potential for concern with this casting? 
+        A: I don't think so. Looking closer, the final uint value is a secret salt which is used to 
+        derive the bytes32 orderHash
+
+    */
     struct Order {
         address maker;
         address taker;
@@ -80,6 +97,7 @@ contract Exchange is SafeMath {
         bytes32 orderHash;
     }
 
+    /* NOTE: instantiate a new exchange, with a pointer to the ZRX token contract and proxy contract */
     function Exchange(address _ZRX_TOKEN_CONTRACT, address _PROXY_CONTRACT) {
         ZRX_TOKEN_CONTRACT = _ZRX_TOKEN_CONTRACT;
         PROXY_CONTRACT = _PROXY_CONTRACT;
@@ -98,9 +116,12 @@ contract Exchange is SafeMath {
     /// @param r CDSA signature parameters r.
     /// @param s CDSA signature parameters s.
     /// @return Total amount of takerToken filled in trade.
+    /* 
+        NOTE: the 'Taker' calls this function with the 'Makers' order details and orderHash
+     */
     function fillOrder(
           address[5] orderAddresses,
-          uint[6] orderValues,
+          uint[6] orderValues, 
           uint fillTakerTokenAmount,
           bool shouldThrowOnInsufficientBalanceOrAllowance,
           uint8 v,
@@ -108,9 +129,11 @@ contract Exchange is SafeMath {
           bytes32 s)
           returns (uint filledTakerTokenAmount)
     {
+        // Question: why do we need `memory` here?
+        // QUESTION: how robust is this function against missing parameters?
         Order memory order = Order({
             maker: orderAddresses[0],
-            taker: orderAddresses[1],
+            taker: orderAddresses[1], // NOTE: Used for 'point to point' orders, without a relayer
             makerToken: orderAddresses[2],
             takerToken: orderAddresses[3],
             feeRecipient: orderAddresses[4],
@@ -119,10 +142,14 @@ contract Exchange is SafeMath {
             makerFee: orderValues[2],
             takerFee: orderValues[3],
             expirationTimestampInSec: orderValues[4],
-            orderHash: getOrderHash(orderAddresses, orderValues)
+            orderHash: getOrderHash(orderAddresses, orderValues) // orderValues[5] is the salt
+            // QUESTION: so what's the point of the salt, if you're passing it to the takers?
+            // Presumably it just ensures that multiple orders can be created with identical parameters,
+            // but still have a unique identifier
         });
 
         require(order.taker == address(0) || order.taker == msg.sender);
+
         require(isValidSignature(
             order.maker,
             order.orderHash,
@@ -131,20 +158,30 @@ contract Exchange is SafeMath {
             s
         ));
 
+        // RVW: Check that the current timestamp is greater than the order expiry as set
         if (block.timestamp >= order.expirationTimestampInSec) {
             LogError(ERROR_ORDER_EXPIRED, order.orderHash);
             return 0;
         }
+        // RVW: hard to read style, prefer multiline
+        uint remainingTakerTokenAmount = safeSub(
+            order.takerTokenAmount, 
+            getUnavailableTakerTokenAmount(order.orderHash));
 
-        uint remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
-        filledTakerTokenAmount = min256(fillTakerTokenAmount, remainingTakerTokenAmount);
+        filledTakerTokenAmount = 
+            min256(
+                fillTakerTokenAmount, 
+                remainingTakerTokenAmount
+            );
+        
         if (filledTakerTokenAmount == 0) {
             LogError(ERROR_ORDER_FULLY_FILLED_OR_CANCELLED, order.orderHash);
             return 0;
         }
 
-        if (isRoundingError(filledTakerTokenAmount, order.takerTokenAmount, order.makerTokenAmount)) {
-            LogError(ERROR_ROUNDING_ERROR_TOO_LARGE, order.orderHash);
+        if (isRoundingError(
+                filledTakerTokenAmount, order.takerTokenAmount, order.makerTokenAmount)) {
+                LogError(ERROR_ROUNDING_ERROR_TOO_LARGE, order.orderHash);
             return 0;
         }
 
@@ -152,25 +189,28 @@ contract Exchange is SafeMath {
             LogError(ERROR_INSUFFICIENT_BALANCE_OR_ALLOWANCE, order.orderHash);
             return 0;
         }
-
+        // NOTE: all functions should be explicitly labelled internal or public...
         uint filledMakerTokenAmount = getPartialAmount(filledTakerTokenAmount, order.takerTokenAmount, order.makerTokenAmount);
         uint paidMakerFee;
         uint paidTakerFee;
         filled[order.orderHash] = safeAdd(filled[order.orderHash], filledTakerTokenAmount);
-        assert(transferViaProxy(
+        assert(transferViaProxy(  // uses all the gas if false
             order.makerToken,
             order.maker,
             msg.sender,
             filledMakerTokenAmount
         ));
-        assert(transferViaProxy(
+        // FLAG: "Griefing" attack creating many orders, to burn people's gas.
+        // maker's account must be constantly monitored
+        assert(transferViaProxy( // uses all the gas if false
             order.takerToken,
             msg.sender,
             order.maker,
             filledTakerTokenAmount
         ));
+        // FLAG: is this check useful? It probably should be done on the client side. 
         if (order.feeRecipient != address(0)) {
-            if (order.makerFee > 0) {
+            if (order.makerFee > 0) { // NOTE: It may be useful to have a negative makerFee to get liquidity
                 paidMakerFee = getPartialAmount(filledTakerTokenAmount, order.takerTokenAmount, order.makerFee);
                 assert(transferViaProxy(
                     ZRX_TOKEN_CONTRACT,
@@ -219,7 +259,7 @@ contract Exchange is SafeMath {
     {
         Order memory order = Order({
             maker: orderAddresses[0],
-            taker: orderAddresses[1],
+            taker: orderAddresses[1], // FLAG: will be 0x2
             makerToken: orderAddresses[2],
             takerToken: orderAddresses[3],
             feeRecipient: orderAddresses[4],
@@ -233,6 +273,7 @@ contract Exchange is SafeMath {
 
         require(order.maker == msg.sender);
 
+        // FLAG: timestamp dependency
         if (block.timestamp >= order.expirationTimestampInSec) {
             LogError(ERROR_ORDER_EXPIRED, order.orderHash);
             return 0;
@@ -421,11 +462,15 @@ contract Exchange is SafeMath {
     /// @param orderAddresses Array of order's maker, taker, makerToken, takerToken, and feeRecipient.
     /// @param orderValues Array of order's makerTokenAmount, takerTokenAmount, makerFee, takerFee, expirationTimestampInSec, and salt.
     /// @return Keccak-256 hash of order.
+    /* 
+        NOTE: this is really the first step. The market maker comes here to create the order to be 
+        listed.
+     */
     function getOrderHash(address[5] orderAddresses, uint[6] orderValues)
         constant
         returns (bytes32 orderHash)
     {
-        return sha3(
+        return sha3( // FLAG: keccak() is better
             address(this),
             orderAddresses[0], // maker
             orderAddresses[1], // taker
@@ -434,8 +479,8 @@ contract Exchange is SafeMath {
             orderAddresses[4], // feeRecipient
             orderValues[0],    // makerTokenAmount
             orderValues[1],    // takerTokenAmount
-            orderValues[2],    // makerFee
-            orderValues[3],    // takerFee
+            orderValues[2],    // makerFee // FLAG: not in whitepaper for point to point orders
+            orderValues[3],    // takerFee // FLAG: not in whitepaper for point to point orders
             orderValues[4],    // expirationTimestampInSec
             orderValues[5]     // salt
         );
@@ -470,6 +515,7 @@ contract Exchange is SafeMath {
     /// @param denominator Denominator.
     /// @param target Value to multiply with numerator/denominator.
     /// @return Rounding error is present.
+    // FLAG: this rounding thing needs attention for sure
     function isRoundingError(uint numerator, uint denominator, uint target)
         constant
         returns (bool isError)
@@ -518,7 +564,7 @@ contract Exchange is SafeMath {
         internal
         returns (bool success)
     {
-        return Proxy(PROXY_CONTRACT).transferFrom(token, from, to, value);
+        return Proxy(PROXY_CONTRACT).transferFrom(token, from, to, value); // FLAG: External call
     }
 
     /// @dev Checks if any order transfers will fail.
@@ -571,7 +617,7 @@ contract Exchange is SafeMath {
         constant
         returns (uint balance)
     {
-        return Token(token).balanceOf(owner);
+        return Token(token).balanceOf(owner); // FLAG: External call
     }
 
     /// @dev Get allowance of token given to PROXY_CONTRACT by an address.
@@ -583,6 +629,6 @@ contract Exchange is SafeMath {
         constant
         returns (uint allowance)
     {
-        return Token(token).allowance(owner, PROXY_CONTRACT);
+        return Token(token).allowance(owner, PROXY_CONTRACT);  // FLAG: External call
     }
 }

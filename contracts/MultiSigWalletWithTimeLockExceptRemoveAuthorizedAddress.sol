@@ -2,6 +2,8 @@ pragma solidity ^0.4.11;
 
 import "./MultiSigWalletWithTimeLock.sol";
 
+// everything except `removeAuthorizedAddress()` is time locked
+
 contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWalletWithTimeLock {
 
     address public PROXY_CONTRACT;
@@ -43,7 +45,7 @@ contract MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress is MultiSigWall
     {
         Transaction tx = transactions[transactionId];
         tx.executed = true;
-        if (tx.destination.call.value(tx.value)(tx.data))
+        if (tx.destination.call.value(tx.value)(tx.data)) // FLAG: EXTERNAL
             Execution(transactionId);
         else {
             ExecutionFailure(transactionId);

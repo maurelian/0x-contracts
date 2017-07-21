@@ -17,6 +17,7 @@
 */
 pragma solidity ^0.4.11;
 
+// NOTE: `MultiSigWalletWithTimeLock` is the owner of this contract according to 5_transfer_ownership deployment script
 import "./base/Token.sol";
 import "./base/Ownable.sol";
 
@@ -26,10 +27,13 @@ contract Proxy is Ownable {
 
     /// @dev Only authorized addresses can invoke functions with this modifier.
     modifier onlyAuthorized {
-        require(authorized[msg.sender]);
+        require(authorized[msg.sender]); // NOTE: require(false) is a REVERT (0xFD)
         _;
     }
 
+    // NOTE: onlyAuthorized could be replace with a call to targetAuthorized(msg.sender)
+    // it should then be renamed to something like `isAuthorized`
+    // the readability is probably justified though. 
     modifier targetAuthorized(address target) {
         require(authorized[target]);
         _;
@@ -54,6 +58,7 @@ contract Proxy is Ownable {
     /// @param target Address to authorize.
     /// @return Success of authorization.
     function addAuthorizedAddress(address target)
+        public // <- add
         onlyOwner
         targetNotAuthorized(target)
         returns (bool success)

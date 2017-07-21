@@ -6,6 +6,9 @@ contract StandardToken is Token {
 
     function transfer(address _to, uint _value) returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
+        // FLAG: what? Is that what it's actually using? 
+        // why do we need overflow then?
+        // what is total supply going to be? 
         if (balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;

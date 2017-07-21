@@ -59,6 +59,7 @@ contract('TokenRegistry', (accounts: string[]) => {
   });
 
   describe('getTokenByName', () => {
+    // FLAG: what if not given the token name?
     it('should return token metadata when given the token name', async () => {
       const tokenData = await tokenRegWrapper.getTokenByNameAsync(token.name);
       assert.deepEqual(tokenData, token);
