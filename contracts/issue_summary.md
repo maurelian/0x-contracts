@@ -1,13 +1,28 @@
 ## General Issues and Comments
 
-* lack of documentation
-* all functions should be explicitly labelled internal or public. There is inconsistent use of the `public` keyword on public functions
 * "Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
 * Is checking againt `address(0)` useful? I don't think so. There are an almost infinite number of ways to throw tokens into a blackhole, no reason to spend computation power on this one in particular.
 
 * Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the Proxy.sol calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
 
 The TokenRegistry.sol may alleviate risks from malicious tokens, but Exchange.sol does not reference it at all.  A possible way to alleviate risks from unknown or malicious tokens, is to require that an exchange only use "whitelisted" tokens by a token registry.
+
+
+The following Issues on Github:
+* https://github.com/0xProject/contracts/issues/92
+* https://github.com/0xProject/contracts/pull/96
+* https://github.com/0xProject/contracts/issues/94
+* https://github.com/0xProject/contracts/issues/89
+* https://github.com/0xProject/contracts/issues/93
+* https://github.com/0xProject/contracts/issues/77
+
+The following Issues on Github that have been fixed:
+* https://github.com/0xProject/contracts/issues/88
+* https://github.com/0xProject/contracts/issues/84
+* https://github.com/0xProject/contracts/issues/91
+* https://github.com/0xProject/contracts/issues/80
+
+* There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  For example, see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
 
 
 ## Contracts
