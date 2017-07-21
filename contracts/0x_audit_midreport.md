@@ -97,13 +97,15 @@ No bugs or security vulnerabilities were found to be directly exploitable, and t
 
 ## 3.2 Major
 
-### 3.2.1 <issue title>
+### 3.2.1 Reentrancy risk from malicious tokens
 
-<issue long description>
+Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the Proxy.sol calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
+
+The TokenRegistry.sol may alleviate risks from malicious tokens, but Exchange.sol does not reference it at all.  A possible way to alleviate risks from unknown or malicious tokens, is to require that an exchange only use "whitelisted" tokens by a token registry.
 
 #### Recommendations
 
-<recommendation to solve the issue>
+In Exchange.sol, `require` that tokens are registered in TokenRegistry.sol.  In TokenRegistry.sol, provide a lookup by address function (possibly by adding a `mapping(address=>bool)`): the function could be called `exists` and the idea is that Exchange.sol would then have `require(registry.exists(makerToken))`. Implement this recommendation in small steps and commits where each commit includes thorough tests. It is likely that each commit will have more test code: for example when adding an `exists` function to the registry, there would probably be tests for: 1) non-existence, 2) existence, 3) non-existence where a prior existing token was removed 4) updating an existing token...
 
 ## 3.3 Medium  
 
