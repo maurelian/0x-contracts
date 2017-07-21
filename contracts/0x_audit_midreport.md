@@ -16,6 +16,7 @@
 - [4 Detailed Solidity Review Findings](#4-detailed-solidity-review-findings)
 - [5 Test Coverage Analysis](#5-test-coverage-analysis)
 	- [5.1 General Discussion](#51-general-discussion)
+- [Appendix - Description of Token Distribution](#description-token-distribution)
 - [Appendix 1 - Audit Participants](#appendix-1-audit-participants)
 - [Appendix 2 - Terminology](#appendix-2-terminology)
 	- [A.2.1 Coverage](#a21-coverage)
@@ -188,9 +189,9 @@ The TD makes uses 2 variables isInitialized and isFinished rather than more "exp
 
 The TD is init() with an order on EXCHANGE_CONTRACT (EC) that is signed by the account that created the ZRX token.  And TD approves the PROXY_CONTRACT (PC) control over TD's EthTokens.
 
-The order's expirationTimestampInSec acts as a time limit for the duration of the distribution.  Until that time limit, addresses that are registered may send ETH with fillOrderWithEth() to get ZRX tokens.  The core mechanism is in 3 steps.
-First, the caller's ETH is deposited into the takerToken contract.  This effectively converts the callers ETH into EthTokens.
-Second, the order is fully executed (fillOrKillOrder() as opposed to partially fillable) on the EC.  The account with the ZRX now has EthTokens, and TD has ZRX tokens.
+The order's expirationTimestampInSec acts as a time limit for the duration of the distribution.  Until that time limit, addresses that are registered may send ETH with fillOrderWithEth() to get ZRX tokens.  The core mechanism is in 3 steps.  
+First, the caller's ETH is deposited into the takerToken contract.  This effectively converts the callers ETH into EthTokens.  
+Second, the order is fully executed (fillOrKillOrder() as opposed to partially fillable) on the EC.  The account with the ZRX now has EthTokens, and TD has ZRX tokens.  
 Third, the TD transfers the ZRX to the caller (msg.sender).
 fillOrderWithEth() should not be called by arbitrary contracts that do not have a way of getting the ZRX tokens out.
 
