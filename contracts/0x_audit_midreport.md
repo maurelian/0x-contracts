@@ -256,7 +256,7 @@ Typically orders will be fillable by anyone.  However, there is a "point-to-poin
 The following are requirements for an order to be filled:
 * Orders that do not have a valid signature from its maker are rejected.
 * Orders must be filled before their expirationTimestampInSec.
-* Orders that have been fully filled or cancelled
+* Orders must not have been fully filled or cancelled
 * A fill that would result in an excess rounding error is disallowed
 * The taker must have enough tokens to fill the order
 
