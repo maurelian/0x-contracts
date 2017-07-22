@@ -92,6 +92,7 @@ $ npm install -g ethereumjs-testrpc@3.0.2
 This section discusses general issues that apply to the contract (and test) code base. These issues are primarily related to architecture, security assumptions and other high level design decisions, and are essential to a thorough security review. Realizing that these decisions are made as part of a set of trade offs, the 0xProject team may decide not to take action on all of our findings. They should however clarify the rationale for such decisions.
 
 The following Issues on Github:
+* https://github.com/0xProject/contracts/issues/98
 * https://github.com/0xProject/contracts/issues/92
 * https://github.com/0xProject/contracts/pull/96
 * https://github.com/0xProject/contracts/issues/94
