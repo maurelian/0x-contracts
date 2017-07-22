@@ -105,7 +105,7 @@ The following Issues on Github that have been closed:
 * https://github.com/0xProject/contracts/issues/84
 * https://github.com/0xProject/contracts/issues/80
 
-* There is a lack of documentation, with many interactions and components of th system not covered at all in the white paper.  For example, see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
+* There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  For example, rounding behaviors https://github.com/0xProject/contracts/issues/98 and also see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
 
 * https://github.com/0xProject/contracts/issues/91 There is no `require` statement to ensure there are no fees, and no `feeRecipient` on the order. This seems unlikely, but does require extra verification of the published code, or simple trust that no fee has been specified. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
 
@@ -119,7 +119,7 @@ Other:
 
 ## 3.1 Critical
 
-No bugs or security vulnerabilities were found to be directly exploitable, and thus critical.
+See the aforementioned open issues on Github.  For example, rounding errors have not been defined could be critical https://github.com/0xProject/contracts/issues/98
 
 ## 3.2 Major
 
