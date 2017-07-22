@@ -122,6 +122,8 @@ Other:
 
 See the aforementioned open issues on Github.  For example, rounding errors have not been defined could be critical https://github.com/0xProject/contracts/issues/98
 
+Missing specifications are themselves a critical issue which limits the understanding of what exactly is an issue. See our attempts at Appendix - Description of Exchange and Appendix - Description of Token Distribution.
+
 ## 3.2 Major
 
 ### 3.2.1 Reentrancy risk from malicious tokens
