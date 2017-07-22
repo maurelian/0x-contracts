@@ -74,10 +74,9 @@ The following documentation was available to the review team:
 
 * The [0x Project Whitepaper](https://0xproject.com/pdfs/0x_white_paper.pdf)
 * The [README](https://github.com/0xProject/contracts/blob/master/README.md) file for the [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository.
+* 
 
 ## 2.4 Dynamic Testing
-
-### Pre-existing tests
 
 The pre-existing tests for [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository were executed using the truffle framework, run against contracts deployed on a local instance of testrpc.
 
@@ -105,32 +104,34 @@ The following Issues on Github that have been closed:
 * https://github.com/0xProject/contracts/issues/88 but the fix didn't include a test.
 * https://github.com/0xProject/contracts/issues/84
 * https://github.com/0xProject/contracts/issues/80
+* https://github.com/0xProject/contracts/issues/91
+* https://github.com/0xProject/contracts/issues/75
 
-* There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  For example, rounding behaviors https://github.com/0xProject/contracts/issues/98 and also see Appendix - Description of Token Distribution.  Furthermore, it may be preferrable for the system to be more codified and deterministic then being dependent on centralized actions such as https://github.com/0xProject/contracts/issues/75 where the timing is essentially arbitrary.
+* There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  Examples include [rounding calculations](https://github.com/0xProject/contracts/issues/98) and the [Token Distribution contract](#description-token-distribution). Furthermore, it may be preferrable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
 
-* https://github.com/0xProject/contracts/issues/91 There is no `require` statement to ensure there are no fees, and no `feeRecipient` on the order. This seems unlikely, but does require extra verification of the published code, or simple trust that no fee has been specified. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
+* `TokenDistributionWithRegistry::init()` has no `require` or `assert` statement to ensure that there are no fees, and no `feeRecipient` specified on the order. This can only be verified by viewing the contract's storage after the order has been created. This is particularly relevant given that the `TokenDistributionWithRegistry` contract uses the Exchange mechanism, but inserts itself as the taker, and then forwards the proceeds to the caller of `fillOrderWithEth()`.
 
 
-Other:
+### Other:
 
 * The `makerFee` value is a uint, making it impossible to give negative fees, which is sometimes useful for incentivizing liquidity.
 
-* We note that the contract is using up 3 storage slots which could be avoided: https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37  This is effectively a one-time cost instead of a recurring cost, so no dangers related to increasing costs.
+* We note that the contract is using up [3 storage slots](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37) which could be avoided. This is effectively a one-time cost instead of a recurring cost, so no dangers related to increasing costs.
 
 
 ## 3.1 Critical
 
-See the aforementioned open issues on Github.  For example, rounding errors have not been defined could be critical https://github.com/0xProject/contracts/issues/98
-
-Missing specifications are themselves a critical issue which limits the understanding of what exactly is an issue. See our attempts at Appendix - Description of Exchange and Appendix - Description of Token Distribution.
+No critical findings.
 
 ## 3.2 Major
 
 ### 3.2.1 Reentrancy risk from malicious tokens
 
-Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the Proxy.sol calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
+Calling an untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. While no evidence of an exploit is currently found, one that we'd like to discuss is the `Proxy.sol` contract calling an untrusted contract's `transferFrom` (https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101).  A malicious token contract could implement its `transferFrom` to reenter the Exchange contract, for example to `fillOrder`s or `cancelOrder`s.
 
-The TokenRegistry.sol may alleviate risks from malicious tokens, but Exchange.sol does not reference it at all.  A possible way to alleviate risks from unknown or malicious tokens, is to require that an exchange only use "whitelisted" tokens by a token registry.
+Implementing `TokenRegistry.sol` may alleviate risks from malicious tokens, but `Exchange.sol` does not reference it at all.  A possible way to alleviate risks from unknown or malicious tokens, is to require that an exchange only use "whitelisted" tokens by a token registry. 
+
+A related source of confusion 
 
 #### Recommendations
 
@@ -165,52 +166,16 @@ It's not clear how an upgraded exchange contract will differentiate from this co
 
 A version string in Exchange.sol may be useful.
 
-# 4 Detailed Solidity Review Findings
-
-## 4.1 <contract file name>
-
-Source File: [`<contract file folder/contract file name`](<link to this file in repo>)
-
-### 4.1.1 <issue title>
-
-Severity: **<issue severity>**
-
-<issue long description>
-
-#### Recommendation
-
-<recommendation to solve the issue>
-
-
 
 # 5 Test Coverage Analysis
 
 Testing is implemented using the Truffle Framework.
 
-Automated measurement was done using [SolCover](https://github.com/JoinColony/solcover).
-
-The quality of test coverage was also assessed by inspection of the code.
-
-## 5.1 General Discussion
-
-<general notes>
-
-
-### 5.2 <contract name>
-
-Test File: [`<test file folder/test file name`](<link to this file in repo>)
-
-Coverage: <coverage>
-
-#### Test Output
-
-```
-<test output>
-```
+Automated measurement was done using [Solidity-Coverage](https://github.com/sc-forks/solidity-coverage).
 
 #### Coverage Notes:
 
-<coverage notes>
+See the `index.html` in the attached `coverage.zip`.
 
 * Coverage Rating: **<rating of coverage>**
 
@@ -237,12 +202,15 @@ The owners of TD set an ethCapPerAddress, and this limits how much ETH can be ex
 Also, at any time, the owners can enable and disable the addresses that can call fillOrderWithEth().
 
 # Appendix - Description of Exchange
+
 The Exchange contract (EC) is the core implementation of the 0x protocol.  The primary functions it provides are:
+
 * Fill a single order: fillOrder()
 * Fully fill an order: fillOrKillOrder()
 * Cancel an order: cancelOrder()
 
 Each function has a corresponding function to work on a batch of multiple orders:
+
 * batchFillOrders()
 * batchFillOrKillOrders()
 * batchCancelOrders()
@@ -254,6 +222,7 @@ The EC does not store orders: the orders are passed in.
 Typically orders will be fillable by anyone.  However, there is a "point-to-point" order where the taker is specified: in these cases the order can only be filled by that specified taker.
 
 The following are requirements for an order to be filled:
+
 * Orders that do not have a valid signature from its maker are rejected.
 * Orders must be filled before their expirationTimestampInSec.
 * Orders must not have been fully filled or cancelled
@@ -261,6 +230,7 @@ The following are requirements for an order to be filled:
 * The taker must have enough tokens to fill the order
 
 Filling an order involves:
+
 * Sending the taker the maker tokens
 * Sending the maker the taker's tokens
 * Updating the order's cumulative filled amount
@@ -368,22 +338,16 @@ https://github.com/0xProject/contracts/commit/888d5a02573572240f4c55e03238be603c
 * tokens/Mintable.sol
 * tokens/ZRXToken.sol
 
-<notes about possibly obsolete or completely unneeded files go here>
-
 ## A.4.2 Static Analysis of Project's Files
 
 ### A.4.2.1 File Count
 
-The number of files present in the project is:
+The number of solidity files present in the project is:
 
 ```
-21
-```
+$ find . -name '*.sol' | wc -l
 
-NIX command used for the statistic:
-
-```
-find . -name '*.sol' | wc -l
+      17
 ```
 
 ### A.4.2.2 LOC Count
@@ -391,39 +355,31 @@ find . -name '*.sol' | wc -l
 The number of LOC present in the project is:
 
 ```
-     365 ./contracts/base/MultiSigWallet.sol
-      27 ./contracts/base/Ownable.sol
-      41 ./contracts/base/SafeMath.sol
-      44 ./contracts/base/StandardToken.sol
-      89 ./contracts/base/StandardTokenWithOverflowProtection.sol
-      38 ./contracts/base/Token.sol
-     588 ./contracts/Exchange.sol
-      23 ./contracts/Migrations.sol
-     132 ./contracts/MultiSigWalletWithTimeLock.sol
-      64 ./contracts/MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
-     116 ./contracts/Proxy.sol
-     297 ./contracts/TokenDistributionWithRegistry.sol
-     309 ./contracts/TokenRegistry.sol
-      33 ./contracts/tokens/DummyToken.sol
-      47 ./contracts/tokens/EtherToken.sol
-      16 ./contracts/tokens/Mintable.sol
-      15 ./contracts/tokens/ZRXToken.sol
-    1676 ./node_modules/truffle/build/Assert.sol
-      13 ./node_modules/truffle/build/SafeSend.sol
-       7 ./node_modules/truffle/build/templates/Example.sol
-      13 ./node_modules/truffle/build/templates/Test.sol
-    3953 total
-```
+$ find . -name '*.sol' | xargs wc -l
 
-NIX command used for the statistic:
-
-```
-find . -name '*.sol' | xargs wc -l
+     366 ./base/MultiSigWallet.sol
+      28 ./base/Ownable.sol
+      45 ./base/SafeMath.sol
+      47 ./base/StandardToken.sol
+      91 ./base/StandardTokenWithOverflowProtection.sol
+      38 ./base/Token.sol
+     634 ./Exchange.sol
+      23 ./Migrations.sol
+     143 ./MultiSigWalletWithTimeLock.sol
+      90 ./MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress.sol
+     125 ./Proxy.sol
+     351 ./TokenDistributionWithRegistry.sol
+     315 ./TokenRegistry.sol
+      33 ./tokens/DummyToken.sol
+      47 ./tokens/EtherToken.sol
+      16 ./tokens/Mintable.sol
+      15 ./tokens/ZRXToken.sol
+    2407 total
 ```
 
 ### A.4.2.3 ABI Inspection
 
-How many functions are there in the project? (please see _Notes_ below)
+How many functions are there in the project's contracts? (please see _Notes_ below)
 
 ```
 202
@@ -435,7 +391,7 @@ How many state-changing functions are there in the project?
 85
 ```
 
-NIX command used for the statistic:
+NIX command used to generate these statistic:
 
 ```
 # output the ABI to a file using solc
