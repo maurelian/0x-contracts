@@ -17,6 +17,7 @@
 - [5 Test Coverage Analysis](#5-test-coverage-analysis)
 	- [5.1 General Discussion](#51-general-discussion)
 - [Appendix - Description of Token Distribution](#description-token-distribution)
+- [Appendix - Description of Exchange](#description-exchange)
 - [Appendix 1 - Audit Participants](#appendix-1-audit-participants)
 - [Appendix 2 - Terminology](#appendix-2-terminology)
 	- [A.2.1 Coverage](#a21-coverage)
@@ -232,6 +233,40 @@ fillOrderWithEth() should not be called by arbitrary contracts that do not have 
 The owners of TD set an ethCapPerAddress, and this limits how much ETH can be exchanged for ZRX by a particular caller.  Excess ETH is sent back to the caller.  Caller cumulative contributions are tracked.  The owners can set ethCapPerAddress to whatever value at any time.
 
 Also, at any time, the owners can enable and disable the addresses that can call fillOrderWithEth().
+
+# Appendix - Description of Exchange
+The Exchange contract (EC) is the core implementation of the 0x protocol.  The primary functions it provides are:
+* Fill a single order: fillOrder()
+* Fully fill an order: fillOrKillOrder()
+* Cancel an order: cancelOrder()
+
+Each function has a corresponding function to work on a batch of multiple orders:
+* batchFillOrders()
+* batchFillOrKillOrders()
+* batchCancelOrders()
+
+The batch functions make no assumption on the multiple orders.  To fill multiple orders with the same takerToken, up to a specified fillTakerTokenAmount, the function fillOrdersUpTo() is provided.
+
+The EC does not store orders: the orders are passed in.
+
+Typically orders will be fillable by anyone.  However, there is a "point-to-point" order where the taker is specified: in these cases the order can only be filled by that specified taker.
+
+The following are requirements for an order to be filled:
+* Orders that do not have a valid signature from its maker are rejected.
+* Orders must be filled before their expirationTimestampInSec.
+* Orders that have been fully filled or cancelled
+* A fill that would result in an excess rounding error is disallowed
+* The taker must have enough tokens to fill the order
+
+Filling an order involves:
+* Sending the taker the maker tokens
+* Sending the maker the taker's tokens
+* Updating the order's cumulative filled amount
+
+If a feeRecipient is specified, the specified maker and taker fees are paid by each party to the feeRecipient.  (Orders are not filled if either party has insufficient ZRX.)  
+Fees are always in amounts of ZRX.
+
+Rounding behavior is either unspecified or is an issue https://github.com/0xProject/contracts/issues/98
 
 
 # Appendix 1 - Audit Participants
