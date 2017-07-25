@@ -147,7 +147,7 @@ contract Exchange is SafeMath {
             // Presumably it just ensures that multiple orders can be created with identical parameters,
             // but still have a unique identifier
         });
-
+        require(fillTakerToken > 0); // NOTE: suggest adding this
         require(order.taker == address(0) || order.taker == msg.sender);
 
         require(isValidSignature(
@@ -174,7 +174,7 @@ contract Exchange is SafeMath {
                 remainingTakerTokenAmount
             );
         
-        if (filledTakerTokenAmount == 0) {
+        if (filledTakerTokenAmount == 0 ) {
             LogError(ERROR_ORDER_FULLY_FILLED_OR_CANCELLED, order.orderHash);
             return 0;
         }
@@ -280,8 +280,12 @@ contract Exchange is SafeMath {
         }
 
         uint remainingTakerTokenAmount = safeSub(order.takerTokenAmount, getUnavailableTakerTokenAmount(order.orderHash));
-        cancelledTakerTokenAmount = min256(canceltakerTokenAmount, remainingTakerTokenAmount);
-        if (cancelledTakerTokenAmount == 0) {
+
+        // cancelledTakerTokenAmount = min256(canceltakerTokenAmount, remainingTakerTokenAmount);
+        if (cancelledTakerTokenAmount == 0) { //require this
+            throw;
+        }
+        if (remainingTakerTokenAmount == 0) { //better
             LogError(ERROR_ORDER_FULLY_FILLED_OR_CANCELLED, order.orderHash);
             return 0;
         }
